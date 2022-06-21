@@ -1,0 +1,25 @@
+#tree1{
+    width: 70%;
+    
+}
+
+.list-group {
+    padding-left: 0;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.item-child{
+    background: #333;
+    color: #FFF;
+}
+
+.float_lft{
+    display:inline;
+    float:left;
+    color:#FFF;
+}
+
+.float_lft.btn-delete{
+    margin-right:5px;
+}

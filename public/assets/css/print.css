@@ -1,0 +1,63 @@
+/* override styles when printing */
+@media print {
+    body{
+      direction: rtl;
+    }
+    .print_display_none{
+      display: none;
+    }
+    .main-footer{
+      display: none;
+    }
+    #tableId th a:after,
+    #tableId2 th a:after,
+    #tableId3 th a:after{
+      display: none;
+    }
+    caption {
+      font-size: 24px;
+    }
+    a.small-box-footer{
+      opacity: 0;
+    }
+    .col-sm-4{
+        width:33.3333%;
+        float:left;
+    }
+
+
+    .tableFixHead{
+      all:unset;
+      display: block !important;
+      width:100% !important;
+    }
+
+    .tableFixHead #tableId,
+    .tableFixHead #tableId2,
+    .tableFixHead #tableId3 {
+      display: table !important;
+      width:100% !important;
+    }
+
+    .tableFixHead thead{
+      display: table-header-group !important;
+      width:100% !important;
+     
+    }
+    .tableFixHead thead th{
+      text-align: center;
+      border: 1px solid #ccc !important;
+    }
+    .tableFixHead tbody{
+       width:100% !important;
+    }
+
+    .print_margn-rght-20{
+      margin-right:-20px !important;
+    }
+  
+
+    table.nestable caption {
+      font-size: 12px;
+    }
+  }
