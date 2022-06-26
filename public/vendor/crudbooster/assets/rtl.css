@@ -1,0 +1,102 @@
+
+@font-face {
+    font-family: 'Droid Arabic Naskh';
+    font-style: normal;
+    font-weight: 400;
+    src: url(fonts/DroidNaskh-Regular.eot);
+    src: url(fonts/DroidNaskh-Regular.eot?#iefix) format('embedded-opentype'),
+    url(fonts/DroidNaskh-Regular.woff2) format('woff2'),
+    url(fonts/DroidNaskh-Regular.woff) format('woff'),
+    url(fonts/DroidNaskh-Regular.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Droid Arabic Kufi';
+    src: url('fonts/DroidKufi/DroidArabicKufi.woff2') format('woff2'),
+        url('fonts/DroidKufi/DroidArabicKufi.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+body{
+    direction: rtl !important;
+    font-family: 'Droid Arabic Kufi' !important;
+    font-style: normal;
+    font-weight: 400;
+}
+/*main font*/
+body, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, .main-header .logo {
+    font-family: "Droid Arabic Kufi";
+}
+
+/*add some padding to the menu*/
+.sidebar-menu>li {
+    position: relative;
+    margin: 0;
+    padding-right: 10px;
+}
+
+/*set the breadcrumb to the left*/
+.content-header > .breadcrumb {
+    float: left !important;
+    right: auto;
+    left: 10px;
+}
+
+/*dashboard icons*/
+.small-box .icon, .box-header > .box-tools {
+    left: 10px;
+    right: auto;
+}
+
+/*fix for som inputs positions*/
+.checkbox input[type=checkbox], .checkbox-inline input[type=checkbox], .radio input[type=radio], .radio-inline input[type=radio] {
+    position: static !important;
+    margin-right: 0;
+    margin-left: 10px;
+}
+
+/*in small screens set the breadcrumb in the middle*/
+@media (max-width: 414px) and (max-width: 414px) {
+    .content-header > .breadcrumb {
+        float: none !important;
+    }
+}
+
+
+/**************** Adding style ***********/
+.select2-container{
+    text-align: right;
+}
+
+.fa-chevron-circle-left:before{
+    content: "\f138" !important;
+}
+.fa-arrow-circle-right:before{
+    content: "\f0a8" !important;
+}
+#btn_advanced_filter{
+    margin-top:-18px !important;
+}
+
+input[type=date].form-control{
+  height: 28px;
+  border-radius: 2px;
+}
+
+.sweet-alert h2{
+    font-size: 22px !important;
+}
+.sweet-alert button{
+    font-family: "Droid Arabic Kufi";
+    font-size: 18px !important;
+}
+
+.select2-container--default.select2-container--focus,
+.select2-selection.select2-container--focus,
+.select2-container--default:focus,
+.select2-selection:focus,
+.select2-container--default:active,
+.select2-selection:active > .select2-selection--single{
+    border-color: #3c8dbc !important ;
+}
