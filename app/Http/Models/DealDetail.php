@@ -8,4 +8,8 @@ class DealDetail extends Model
 {
     protected $table = 'deal_details';
     public $timestamps = true;
+
+    public function study_engineer(){
+        return $this->belongsTo(User::class,"study_engineer_id");
+    }
 }

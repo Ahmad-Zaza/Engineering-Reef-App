@@ -117,7 +117,7 @@
                                 <span>{{ trans('crudbooster.Menu_Management') }}</span></a>
                         </li>
                     @endif
-                    @if (1 == 0)
+                    @if (1 == 1)
                         <li class='treeview'>
                             <a href='#'><i class='fa fa-key'></i>
                                 <span>{{ trans('crudbooster.Privileges_Roles') }}</span> <i

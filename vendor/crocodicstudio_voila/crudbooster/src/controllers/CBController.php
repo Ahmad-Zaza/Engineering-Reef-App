@@ -661,8 +661,11 @@ class CBController extends Controller
 
         //add by fesal for sorting rows
         $data['table_name'] = $this->table;
-
-        return view("crudbooster::default.index", $data);
+        if (view()->exists(CrudBooster::getCurrentModule()->path . '.index')) {
+            return view(CrudBooster::getCurrentModule()->path . '.index', $data);
+        } else {
+            return view("crudbooster::default.index", $data);
+        }        
     }
 
     public function getExportData()

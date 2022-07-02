@@ -27,6 +27,7 @@ class AdminCmsUsersController extends \crocodicstudio_voila\crudbooster\controll
         $this->button_import = CRUDBooster::me()->id_cms_privileges == 1;
         $this->button_export = false;
         $this->button_delete = false;
+        $this->button_filter = false;
         $this->button_bulk_action = true;
         # END CONFIGURATION DO NOT REMOVE THIS LINE
 

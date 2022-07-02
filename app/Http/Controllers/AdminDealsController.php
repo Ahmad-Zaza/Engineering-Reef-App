@@ -31,8 +31,6 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
         # START CONFIGURATION DO NOT REMOVE THIS LINE
         $this->title_field = "deal_engineer_name";
         $this->limit = "20";
-        // $this->orderby = ["file_num asc","study_name asc"];
-        // $this->orderby = array('file_num' => 'asc', 'deal_details.study_name' => 'asc');
         $this->global_privilege = false;
         $this->button_table_action = true;
         $this->button_bulk_action = false;
@@ -44,7 +42,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
         $this->button_delete = false;
         $this->button_detail = false;
         $this->button_show = true;
-        $this->button_filter = true;
+        $this->button_filter = false;
         $this->button_import = CRUDBooster::me()->id_cms_privileges == 1;
         // $this->button_import = true;
         $this->button_export = true;
@@ -282,14 +280,6 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
         $query->leftjoin("deal_details", "deal_details.deal_id", "=", "deals.id");
         $query->leftjoin("cms_users as study_user", "deal_details.study_engineer_id", "=", "study_user.id");
         if (CrudBooster::me()->id_cms_privileges == 2) {
-            // $dealIds = DB::table('deal_details')
-            //     ->where("deal_details.study_engineer_id", CrudBooster::me()->id)
-            //     ->select('deal_details.deal_id')
-            //     ->get()->pluck("deal_id")->toArray();
-            // if ($dealIds) {
-            //     $query->whereIn("deals.id", $dealIds);
-            // } else {
-            // }
             $query->where("deal_details.study_engineer_id", CrudBooster::me()->id);
         }
         //Your code here
@@ -457,7 +447,6 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
             if ($prog >= 100) {
                 Cache::forget('success_' . $file_md5);
             }
-
             return response()->json(['progress' => $prog, 'last_error' => Cache::get('error_' . $file_md5)]);
         }
 
@@ -466,11 +455,6 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
 
         $rows = Excel::load($file, function ($reader) {
         })->get();
-
-        $has_created_at = false;
-        if (CRUDBooster::isColumnExists($this->table, 'created_at')) {
-            $has_created_at = true;
-        }
         $total_file_records = 0;
         $total_successfully = 0;
         $total_failed = 0;
@@ -484,6 +468,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
         $engineers = DB::table('cms_users')->where("id_cms_privileges", 2)->pluck("id", "num")->toArray();
         $deals = DB::table('deals')->pluck("id", "file_num")->toArray();
         foreach ($rows as $value) {
+            dd($value);
             if (!$value["rkm_almaaaml"]) {
                 $failedError[] = $value;
                 $total_failed++;
@@ -518,6 +503,9 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
                 "owner_name" => $value["sahb_alaalak"],
                 "file_status" => $value["hal_almaaaml"],
                 "organization_name" => $value["almntk_altnthymy_latthhr_fy_altkryr"],
+                "total_space" => $value["almsah_alejmaly"],
+                "license_sum" => $value["mjmoaa_alrkhs"],
+                "floors_count" => $value["aadd_altoabk"],
             ];
 
             $dealDetailsData = [
@@ -535,6 +523,10 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
                 if (!$deals[$value["rkm_almaaaml"]]) {
                     $deal = Deal::create($dealData);
                     $deals[$value["rkm_almaaaml"]] = $deal->id;
+                    DealDetail::where("deal_id",$deal->id)->delete();
+                } 
+                else {
+                    Deal::where("id",$deals[$value["rkm_almaaaml"]])->update($dealData);
                 }
                 $dealDetailsData["deal_id"] = $deals[$value["rkm_almaaaml"]];
                 DB::table("deal_details")->insert($dealDetailsData);
@@ -562,7 +554,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
         $this->cbLoader();
         ini_set('memory_limit', '-1');
         $data['page_menu'] = Route::getCurrentRoute()->getActionName();
-        $data['page_title'] = trans('crudbooster.import_page_title', ['module' => $module->name]);
+        $data['page_title'] = trans('crudbooster.import_page_title', ['module' => "deals"]);
         Session::put('select_column', Request::get('select_column'));
 
         if (view()->exists(CrudBooster::getCurrentModule()->path . '.import')) {
@@ -576,7 +568,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
     {
         $this->cbLoader();
         $data['page_menu'] = Route::getCurrentRoute()->getActionName();
-        $data['page_title'] = trans('crudbooster.import_page_title', ['module' => $module->name]);
+        $data['page_title'] = trans('crudbooster.import_page_title', ['module' => "deals"]);
         Session::put('select_column', Request::get('select_column'));
 
         if (view()->exists(CrudBooster::getCurrentModule()->path . '.import')) {
@@ -723,18 +715,5 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
         ];
         // dd($data);
         return $data;
-    }
-}
-class MYPDF extends TCPDF
-{
-    // Page footer
-    public function Footer()
-    {
-        // Position at 15 mm from bottom
-        $this->SetY(-15);
-        // Set font
-        $this->SetFont('dejavusans', '', 8);
-        // Page number
-        $this->Cell(0, 10, $this->getAliasNumPage() . '/' . $this->getAliasNbPages() . " " . 'صفحة', 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
 }
