@@ -1,7 +1,7 @@
 <?php namespace App\Http\Controllers;
 
-use App\Http\Models\FinancialDeal;
 use App\Http\Models\ImportOperation;
+use App\Http\Models\PaidDeal;
 use Carbon\Carbon;
 use crocodicstudio_voila\crudbooster\helpers\CB;
 use crocodicstudio_voila\crudbooster\helpers\CRUDBooster;
@@ -17,71 +17,45 @@ use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use TCPDF_FONTS;
 
-class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\controllers\CBController
+class AdminDealDetails131Controller extends \crocodicstudio_voila\crudbooster\controllers\CBController
 {
 
     public function cbInit()
     {
-
         # START CONFIGURATION DO NOT REMOVE THIS LINE
+        $this->table = "deal_details";
         $this->title_field = "id";
-        $this->limit = "20";
+        $this->limit = 20;
         $this->orderby = "id,desc";
+        $this->show_numbering = false;
         $this->global_privilege = false;
         $this->button_table_action = true;
-        $this->button_bulk_action = true;
         $this->button_action_style = "button_icon";
         $this->button_add = false;
-        $this->button_edit = false;
         $this->button_delete = false;
+        $this->button_edit = false;
         $this->button_detail = false;
-        $this->button_show = true;
+        $this->button_show = false;
         $this->button_filter = true;
-        $this->button_import = true;
         $this->button_export = true;
-        $this->table = "financial_deals";
+        $this->button_import = false;
+        $this->button_bulk_action = true;
+        $this->sidebar_mode = "normal"; //normal,mini,collapse,collapse-mini
         # END CONFIGURATION DO NOT REMOVE THIS LINE
 
         # START COLUMNS DO NOT REMOVE THIS LINE
         $this->col = [];
-        $this->col[] = ["label" => "المهندس", "name" => "engineer_id", "join" => "cms_users,name"];
-        $this->col[] = ["label" => "السنة", "name" => "financial_year"];
-        $this->col[] = ["label" => "الشهر", "name" => "financial_month"];
-        $this->col[] = ["label" => "العامل", "name" => "factor"];
-        $this->col[] = ["label" => "الأتعاب", "name" => "effort"];
-        $this->col[] = ["label" => "النظام المالي", "name" => "financial_system"];
-        $this->col[] = ["label" => "النسبة", "name" => "percent", "visible" => false];
-        $this->col[] = ["label" => "حصة الأتعاب", "name" => "effort_percent", "visible" => false];
-        $this->col[] = ["label" => "مورد المشترك", "name" => "share_in", "visible" => false];
-        $this->col[] = ["label" => "مقبوض المشترك", "name" => "share_out", "visible" => false];
-        $this->col[] = ["label" => "مقبوض التدقيق", "name" => "veri_out", "visible" => false];
-        $this->col[] = ["label" => "مقبوض المقيم", "name" => "resident_out", "visible" => false];
-        $this->col[] = ["label" => "مقبوض الإضبارة", "name" => "folder_out", "visible" => false];
-        $this->col[] = ["label" => "الإشراف", "name" => "supervision", "visible" => false];
-        $this->col[] = ["label" => "الحسومات", "name" => "discount", "visible" => false];
-        $this->col[] = ["label" => "التعويضات", "name" => "compensation", "visible" => false];
-        $this->col[] = ["label" => "المبلغ الكلي", "name" => "total_amount", "visible" => false];
-        $this->col[] = ["label" => "ملاحظات", "name" => "notes", "visible" => false];
-        # END COLUMNS DO NOT REMOVE THIS LINE
+        $this->col[] = array("label" => "رقم المهندس", "name" => "deal_details.study_engineer_id", "join" => "cms_users,num");
+        $this->col[] = array("label" => "اسم المهندس", "name" => "cms_users.name");
+        $this->col[] = array("label" => "رقم المعاملة", "name" => "deal_details.deal_id", "join" => "deals,file_num");
+        $this->col[] = array("label" => "تاريخ المعاملة", "name" => "deals.file_date");
+        $this->col[] = array("label" => "الشهر", "name" => "deals.close_month", "visible" => false);
+        $this->col[] = array("label" => "العام", "name" => "deals.close_year", "visible" => false);
+        $this->col[] = array("label" => "المبلغ الكلي", "name" => "deal_details.study_resident_value");
 
+        # END COLUMNS DO NOT REMOVE THIS LINE
         # START FORM DO NOT REMOVE THIS LINE
         $this->form = [];
-        $this->form[] = ["label" => "المهندس", "name" => "engineer_id", "type" => "select2", "required" => true, "validation" => "required|integer|min:0", "datatable" => "cms_users,name"];
-        $this->form[] = ["label" => "العامل", "name" => "factor", "type" => "text", "required" => true, "validation" => "required|min:1|max:255"];
-        $this->form[] = ["label" => "الأتعاب", "name" => "effort", "type" => "text", "required" => true, "validation" => "required|min:1|max:255"];
-        $this->form[] = ["label" => "النظام المالي", "name" => "financial_system", "type" => "text", "required" => true, "validation" => "required|min:1|max:255"];
-        $this->form[] = ["label" => "النسبة", "name" => "percent", "type" => "text", "required" => true, "validation" => "required|min:1|max:255"];
-        $this->form[] = ["label" => "حصة الأتعاب", "name" => "effort_percent", "type" => "text", "required" => true, "validation" => "required|min:1|max:255"];
-        $this->form[] = ["label" => "مورد المشترك", "name" => "share_in", "type" => "text", "required" => true, "validation" => "required|min:1|max:255"];
-        $this->form[] = ["label" => "مقبوض المشترك", "name" => "share_out", "type" => "text", "required" => true, "validation" => "required|min:1|max:255"];
-        $this->form[] = ["label" => "مقبوض التدقيق", "name" => "veri_out", "type" => "text", "required" => true, "validation" => "required|min:1|max:255"];
-        $this->form[] = ["label" => "مقبوض المقيم", "name" => "resident_out", "type" => "text", "required" => true, "validation" => "required|min:1|max:255"];
-        $this->form[] = ["label" => "مقبوض الإضبارة", "name" => "folder_out", "type" => "text", "required" => true, "validation" => "required|min:1|max:255"];
-        $this->form[] = ["label" => "الإشراف", "name" => "supervision", "type" => "text", "required" => true, "validation" => "required|min:1|max:255"];
-        $this->form[] = ["label" => "الحسومات", "name" => "discount", "type" => "text", "required" => true, "validation" => "required|min:1|max:255"];
-        $this->form[] = ["label" => "التعويضات", "name" => "compensation", "type" => "text", "required" => true, "validation" => "required|min:1|max:255"];
-        $this->form[] = ["label" => "المبلغ الكلي", "name" => "total_amount", "type" => "text", "required" => true, "validation" => "required|min:1|max:255"];
-        $this->form[] = ["label" => "ملاحظات", "name" => "notes", "type" => "text", "required" => true, "validation" => "required|min:1|max:255"];
 
         # END FORM DO NOT REMOVE THIS LINE
 
@@ -258,26 +232,27 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
     public function hook_query_index(&$query)
     {
         //Your code here
-        $query->leftjoin("cms_users as engineer", "financial_deals.engineer_id", "=", "engineer.id");
+        $query->leftjoin("cms_users as engineer", "deal_details.study_engineer_id", "=", "engineer.id");
         if (CrudBooster::me()->id_cms_privileges == 2) {
-            $query->where("financial_deals.engineer_id", CrudBooster::me()->id);
+            $query->where("deal_details.study_engineer_id", CrudBooster::me()->id);
         }
         //Your code here
         if (Request::get("month")) {
-            $query->where("financial_month", Request::get("month"));
+            $query->where("close_month", Request::get("month"));
         }
         if (Request::get("year")) {
-            $query->where("financial_year", Request::get("year"));
+            $query->where("close_year", Request::get("year"));
         }
         if (Request::get("engineer")) {
             $query->where("engineer.num", Request::get("engineer"));
         }
         if ((!Request::get('year') || !Request::get('month') || !Request::get('engineer')) &&  CrudBooster::me()->id_cms_privileges == 1) {
-            $query->where("financial_deals.id", "-1");
+            $query->where("deal_details.id", "-1");
         }
         else if ((!Request::get('year') || !Request::get('month')) &&  CrudBooster::me()->id_cms_privileges == 2) {
-            $query->where("financial_deals.id", "-1");
+            $query->where("deal_details.id", "-1");
         }
+		$query->where("deal_details.study_resident_value",">",0);
     }
 
     /*
@@ -371,159 +346,6 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
     }
 
     //By the way, you can still create your own method in here... :)
-    public function postDoUploadImportData()
-    {
-        $this->cbLoader();
-        if (Request::hasFile('userfile')) {
-            $file = Request::file('userfile');
-            session()->put("file_name", $file->originalName);
-            $ext = $file->getClientOriginalExtension();
-
-            $validator = Validator::make([
-                'extension' => $ext,
-            ], [
-                'extension' => 'in:xls,xlsx,csv',
-            ]);
-
-            if ($validator->fails()) {
-                $message = $validator->errors()->all();
-                return redirect()->back()->with(['message' => implode('<br/>', $message), 'message_type' => 'warning']);
-            }
-
-            //Create Directory Monthly
-            $filePath = 'uploads/' . CB::myId() . '/' . date('Y-m');
-            Storage::makeDirectory($filePath);
-
-            //Move file to storage
-            $filename = md5(str_random(5)) . '.' . $ext;
-            $url_filename = '';
-            if (Storage::putFileAs($filePath, $file, $filename)) {
-                $url_filename = $filePath . '/' . $filename;
-            }
-            $url = CRUDBooster::mainpath('import-data') . '?file=' . base64_encode($url_filename) . "&import=1";
-
-            return redirect($url);
-        } else {
-            return redirect()->back();
-        }
-    }
-
-    public function postDoImportChunk()
-    {
-        set_time_limit(0);
-        ini_set('memory_limit', '-1');
-        $this->cbLoader();
-        $file_md5 = md5(Request::get('file'));
-
-        if (Request::get('file') && Request::get('resume') == 1) {
-            $total = Session::get('total_data_import');
-            $prog = 0;
-            if ($total > 0) {
-                $prog = intval(Cache::get('success_' . $file_md5)) / $total * 100;
-            }
-            $prog = round($prog);
-            if ($prog >= 100) {
-                Cache::forget('success_' . $file_md5);
-            }
-            return response()->json(['progress' => $prog, 'last_error' => Cache::get('error_' . $file_md5)]);
-        }
-
-        $file = base64_decode(Request::get('file'));
-        $file = storage_path('app/' . $file);
-
-        $rows = Excel::load($file, function ($reader) {
-        })->get();
-        $total_file_records = 0;
-        $total_successfully = 0;
-        $total_failed = 0;
-        $failedError = [];
-        $operation = ImportOperation::create([
-            "type" => "القبض الشهري",
-            "date" => Carbon::now(),
-            "file_name" => session("file_name"),
-            "total_studies_before" => FinancialDeal::get()->count(),
-        ]);
-        $engineers = DB::table('cms_users')->where("id_cms_privileges", 2)->pluck("id", "num")->toArray();
-        foreach ($rows as $value) {
-            if (!$value["rkm_almhnds"]) {
-                $failedError[] = $value;
-                $total_failed++;
-                continue;
-            }
-            $engineer_id = $engineers[$value["rkm_almhnds"]];
-
-            $financialDealData = [
-                "operation_id" => $operation->id,
-                "engineer_id" => $engineer_id,
-                "financial_year" => $value["alsn"],
-                "financial_month" => $value["alshhr"],
-                "factor" => $value["aaaml_alzmyl"],
-                "effort" => $value["alataaab"],
-                "financial_system" => $value["alntham_almaly"],
-                "percent" => $value["alnsb"],
-                "effort_percent" => $value["alhs"],
-                "share_out" => $value["mkbod_mshtrk"],
-                "share_in" => $value["mord_llmshtrk"],
-                "veri_out" => $value["mkbod_tdkyk"],
-                "resident_out" => $value["rdyat_mkym"],
-                "folder_out" => $value["rdyat_edbar"],
-                "supervision" => $value["ashraf"],
-                "discount" => $value["hsmyat"],
-                "compensation" => $value["taaoydat"],
-                "total_amount" => $value["almkbod_alkly"],
-                "notes" => $value["mlahthat"],
-            ];
-
-            try {
-                $total_file_records++;
-                $deal = FinancialDeal::create($financialDealData);
-                $total_successfully++;
-                Cache::increment('success_' . $file_md5);
-            } catch (\Exception $e) {
-                Log::log("error", "Error Importing FinancialDeals " . $e->getMessage());
-                $total_failed++;
-                $failedError[] = $value;
-                $e = (string) $e;
-                Cache::put('error_' . $file_md5, $e, 500);
-            }
-        }
-        $operation->update([
-            "total_file_records" => $total_file_records,
-            "total_successfully" => $total_successfully,
-            "total_failed" => $total_failed,
-            "failed_errors" => json_encode($failedError),
-        ]);
-        return response()->json(['status' => true]);
-    }
-
-    public function getImportData()
-    {
-        $this->cbLoader();
-        ini_set('memory_limit', '-1');
-        $data['page_menu'] = Route::getCurrentRoute()->getActionName();
-        $data['page_title'] = trans('crudbooster.import_page_title', ['module' => "القبض الشهري"]);
-        Session::put('select_column', Request::get('select_column'));
-
-        if (view()->exists(CrudBooster::getCurrentModule()->path . '.import')) {
-            return view(CrudBooster::getCurrentModule()->path . '.import', $data);
-        } else {
-            return view('crudbooster::import', $data);
-        }
-
-    }
-    public function postDoneImport()
-    {
-        $this->cbLoader();
-        $data['page_menu'] = Route::getCurrentRoute()->getActionName();
-        $data['page_title'] = trans('crudbooster.import_page_title', ['module' => "القبض الشهري"]);
-        Session::put('select_column', Request::get('select_column'));
-
-        if (view()->exists(CrudBooster::getCurrentModule()->path . '.import')) {
-            return view(CrudBooster::getCurrentModule()->path . '.import', $data);
-        } else {
-            return view('crudbooster::import', $data);
-        }
-    }
 
     public function postExportData()
     {
@@ -535,13 +357,15 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
         $papersize = Request::input('page_size');
         $paperorientation = Request::input('page_orientation');
         Request::merge(['limit' => 1000]);
-        $response = $this->getIndex()["result"][0];
+        $response = $this->getIndex();
+        // dd($response);
         if (Request::input('default_paper_size')) {
             DB::table('cms_settings')->where('name', 'default_paper_size')->update(['content' => $papersize]);
         }
+
         switch ($filetype) {
             case "pdf":
-                $pdf = new MYPDF("P", PDF_UNIT, "A4", true, 'UTF-8', false);
+                $pdf = new MYPDF("L", PDF_UNIT, "A4", true, 'UTF-8', false);
                 $lg = array();
                 $lg['a_meta_charset'] = 'UTF-8';
                 $lg['a_meta_dir'] = 'rtl';
@@ -565,9 +389,8 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
 
                 $pdf->AddPage();
                 $pdf->setPrintFooter(true);
-                // dd((array) $response);
                 if (view()->exists(CrudBooster::getCurrentModule()->path . '.export')) {
-                    $html = view(CrudBooster::getCurrentModule()->path . '.export',(array)  $response)->render();
+                    $html = view(CrudBooster::getCurrentModule()->path . '.export', $response)->render();
                 } else {
                     $html = view('crudbooster::export', $response)->render();
                 }
@@ -604,36 +427,4 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
         }
     }
 
-    public function getExportIndex()
-    {
-        $this->cbLoader();
-
-        $module = CRUDBooster::getCurrentModule();
-        $data['limit'] = $limit = (Request::get('limit')) ? Request::get('limit') : $this->limit;
-        $result = DB::table($this->table);
-        $table = $this->table;
-        $result->leftjoin("cms_users as engineer", "financial_deals.engineer_id", "=", "engineer.id");
-        $result->select(["financial_deals.*", "engineer.num as engineer_num", "engineer.name as engineer_name"]);
-        if (Request::get("engineer") && CRUDBooster::me()->id_cms_privileges == 1) {
-            $engineer = DB::table("cms_users")->where("num", Request::get("engineer"))->first();
-            $engineer_num = $engineer->num;
-            $engineer_name = $engineer->name;
-            $result->where("engineer.num", Request::get("engineer"));
-        } else if (CRUDBooster::me()->id_cms_privileges == 2) {
-            $engineer_num = CRUDBooster::me()->num;
-            $engineer_name = CRUDBooster::me()->name;
-            $result->whereIn("financial_deals.engineer_id", CRUDBooster::me()->id);
-        }
-        if (Request::get("month")) {
-            $result->where("financial_deals.financial_month", Request::get("month"));
-        }
-        if (Request::get("year")) {
-            $result->where("financial_deals.financial_year", Request::get("year"));
-        }
-        $result->orderby("id", "desc");
-        $data['result'] = $result->paginate($limit);
-        $data['engineer_num'] = $engineer_num;
-        $data['engineer_name'] = $engineer_name;
-        return $data;
-    }
 }
