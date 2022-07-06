@@ -69,24 +69,6 @@
                         @endif
                     </li>
                 @endforeach
-                <li class='static'>
-                    <a type="button" class='text-normal'>
-                        <i class='fa fa-th text-normal'></i>
-                        <span>عرض تفاصيل المعاملات</span>
-                    </a>
-                </li>
-                <li class='static'>
-                    <a type="button" class='text-normal'>
-                        <i class='fa fa-th text-normal'></i>
-                        <span style="font-size: 13px;">الإقامات المسددة وغير المسددة</span>
-                    </a>
-                </li>
-                <li class='static'>
-                    <a type="button" class='text-normal'>
-                        <i class='fa fa-th text-normal'></i>
-                        <span>القبض الشهري</span>
-                    </a>
-                </li>
                 @if (CRUDBooster::isSuperadmin())
                     <li class="header">{{ trans('crudbooster.SUPERADMIN') }}</li>
 

@@ -1519,7 +1519,6 @@ class CBController extends Controller
         $command = 'detail';
 
         Session::put('current_row_id', $id);
-
         return view('crudbooster::default.form', compact('row', 'page_menu', 'page_title', 'command', 'id'));
     }
 

@@ -1,6 +1,12 @@
 <?php
 
 /* ROUTER FOR API GENERATOR */
+
+use crocodicstudio_voila\crudbooster\helpers\CRUDBooster;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Route;
+
 $namespace = '\crocodicstudio_voila\crudbooster\controllers';
 
 Route::group(['middleware' => ['api', '\crocodicstudio_voila\crudbooster\middlewares\CBAuthAPI'], 'namespace' => 'App\Http\Controllers'], function () {
@@ -46,7 +52,6 @@ Route::group(['middleware' => ['web'], 'prefix' => config('crudbooster.ADMIN_PAT
 });
 Route::group(['prefix' => config('crudbooster.ADMIN_PATH'), 'namespace' => $namespace], function () {
 
-Route::get('Deals',['uses' => 'DealsController@getDeals', 'as' => 'getDeals']);
 });
 // ROUTER FOR OWN CONTROLLER FROM CB
 Route::group([
