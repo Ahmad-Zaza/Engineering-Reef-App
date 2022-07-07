@@ -52,6 +52,9 @@ class AdminDealDetails131Controller extends \crocodicstudio_voila\crudbooster\co
         $this->col[] = array("label" => "الشهر", "name" => "deals.close_month", "visible" => false);
         $this->col[] = array("label" => "العام", "name" => "deals.close_year", "visible" => false);
         $this->col[] = array("label" => "المبلغ الكلي", "name" => "deal_details.study_resident_value");
+        $this->col[] = array("label" => "صاحب العلاقة", "name" => "deals.owner_name");
+        $this->col[] = array("label" => "المنطقة العقارية", "name" => "deals.real_estate_area");
+        $this->col[] = array("label" => "ارقام العقار", "name" => "deals.real_estate_num");
 
         # END COLUMNS DO NOT REMOVE THIS LINE
         # START FORM DO NOT REMOVE THIS LINE
@@ -238,10 +241,10 @@ class AdminDealDetails131Controller extends \crocodicstudio_voila\crudbooster\co
         }
         //Your code here
         if (Request::get("month")) {
-            $query->where("close_month", Request::get("month"));
+            $query->where("close_month","<=",Request::get("month"));
         }
         if (Request::get("year")) {
-            $query->where("close_year", Request::get("year"));
+            $query->where("close_year","<=",Request::get("year"));
         }
         if (Request::get("engineer")) {
             $query->where("engineer.num", Request::get("engineer"));
@@ -253,6 +256,8 @@ class AdminDealDetails131Controller extends \crocodicstudio_voila\crudbooster\co
             $query->where("deal_details.id", "-1");
         }
 		$query->where("deal_details.study_resident_value",">",0);
+        $query->orderBy("deals.file_num","desc");
+		$query->orderBy("deals.file_date","desc");
     }
 
     /*
@@ -358,6 +363,8 @@ class AdminDealDetails131Controller extends \crocodicstudio_voila\crudbooster\co
         $paperorientation = Request::input('page_orientation');
         Request::merge(['limit' => 1000]);
         $response = $this->getIndex();
+        $response["month"] = Request::get("month");
+        $response["year"] = Request::get("year");
         // dd($response);
         if (Request::input('default_paper_size')) {
             DB::table('cms_settings')->where('name', 'default_paper_size')->update(['content' => $papersize]);

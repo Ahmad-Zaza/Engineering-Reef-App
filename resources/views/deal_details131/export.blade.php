@@ -26,10 +26,14 @@
 @else
 <body>
     <h3>
-        الإقامات غير المسددة للمهندس:
+        الإقامات غير المسددة لدراسات المهندس:
         <span>- {{ $result[0]->cms_users_num }} :</span>
         <span>{{ $result[0]->cms_users_name }}</span>
         <span>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</span>
+        <span>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</span>
+        <span>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</span>
+        حتى الشهر 
+        <span>{{ $month ." - ". $year }}</span>
     </h3>
     <table cellpadding="2" border="1" style="border-collapse: collapse;font-size:12px" width="100%">
         <thead>

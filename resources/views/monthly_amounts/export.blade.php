@@ -25,8 +25,15 @@
         جدول المبالغ المالية للمهندس:
         <span>{{ $cms_users_name ." - ". $cms_users_num }}</span>
         <span>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</span>
+        <span>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</span>
+        <span>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</span>
+        <span>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</span>
+        للشهر
+        <span>{{ $financial_month }}</span>
+        السنة
+        <span>{{ $financial_year }}</span>
     </h3>
-    <table cellpadding="4" border="0" style="border-collapse: collapse;font-size:13px;margin-right:auto;margin-left:auto" width="100%">
+    <table cellpadding="4" border="0" style="border-collapse: collapse;font-size:12px;margin-right:auto;margin-left:auto" width="100%">
         <tbody>
             <tr nobr="true">
                 <td></td>

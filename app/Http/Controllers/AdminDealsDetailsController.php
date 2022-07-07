@@ -485,4 +485,21 @@ class MYPDF extends TCPDF
         // Page number
         $this->Cell(0, 10, $this->getAliasNumPage() . '/' . $this->getAliasNbPages() . " " . 'صفحة', 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
+
+    public function Header(){
+        $fontFile = $_SERVER["DOCUMENT_ROOT"] . "/fonts/arial.ttf";
+        $fontname = TCPDF_FONTS::addTTFfont($fontFile, 'TrueTypeUnicode', '');
+        // // use the font
+        $this->SetFont($fontname, '', 10, '', false);
+        // $image_file = "images/portfolio_logo.png";
+        // $this->Image($image_file, 10, 10, 15, '', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+        // Title
+        // $this->Image($image_file, 10, 10, 15, '', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+
+        // $this->Image($image_file, 10, 10, 15, '', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+        // Title
+        // $this->Cell(0, 15, '<< TCPDF Example 003 >>', 0, false, 'L', 0, '', 0, false, 'M', 'M');
+
+        $this->Cell(0, 15, 'نقابة المـهـنـدسـيـن فرع ريف دمشق', 0, false, 'C', 0, '', 0, false, 'T', 'M');
+    }
 }

@@ -126,6 +126,7 @@
                             $months = Db::table('paid_deals')
                                 ->distinct('month')
                                 ->select('month')
+                                ->orderby('month')
                                 ->get()
                                 ->pluck('month');
                         @endphp
@@ -162,6 +163,7 @@
                             $years = Db::table('paid_deals')
                                 ->distinct('year')
                                 ->select('year')
+                                ->orderby('year')
                                 ->get()
                                 ->pluck('year');
                         @endphp

@@ -415,7 +415,7 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
         $total_failed = 0;
         $failedError = [];
         $operation = ImportOperation::create([
-            "type" => "إقامات دراسة غير مسددة",
+            "type" => "إقامات مسددة",
             "date" => Carbon::now(),
             "file_name" => session("file_name"),
             "total_studies_before" => PaidDeal::get()->count(),
@@ -459,7 +459,7 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
             "total_file_records" => $total_file_records,
             "total_successfully" => $total_successfully,
             "total_failed" => $total_failed,
-            // "failed_errors" => json_encode($failedError),
+            "failed_errors" => json_encode($failedError),
         ]);
         return response()->json(['status' => true]);
     }
@@ -469,7 +469,7 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
         $this->cbLoader();
         ini_set('memory_limit', '-1');
         $data['page_menu'] = Route::getCurrentRoute()->getActionName();
-        $data['page_title'] = trans('crudbooster.import_page_title', ['module' => "إقامات دراسة غير مسددة"]);
+        $data['page_title'] = trans('crudbooster.import_page_title', ['module' => "إقامات مسددة"]);
         Session::put('select_column', Request::get('select_column'));
 
         if (view()->exists(CrudBooster::getCurrentModule()->path . '.import')) {
@@ -483,7 +483,7 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
     {
         $this->cbLoader();
         $data['page_menu'] = Route::getCurrentRoute()->getActionName();
-        $data['page_title'] = trans('crudbooster.import_page_title', ['module' => "إقامات دراسة غير مسددة"]);
+        $data['page_title'] = trans('crudbooster.import_page_title', ['module' => "إقامات مسددة"]);
         Session::put('select_column', Request::get('select_column'));
 
         if (view()->exists(CrudBooster::getCurrentModule()->path . '.import')) {

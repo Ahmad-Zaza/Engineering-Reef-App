@@ -485,6 +485,7 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
                 $failedError[] = $value;
                 $e = (string) $e;
                 Cache::put('error_' . $file_md5, $e, 500);
+                Log::log('error',"Error importing monthly paid $e");
             }
         }
         $operation->update([
@@ -555,7 +556,7 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
                 $pdf->setRTL(true);
                 //set margins
                 $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-                $pdf->SetPrintHeader(false);
+                $pdf->SetPrintHeader(true);
 
                 // convert TTF font to TCPDF format and store it on the fonts folder
                 $fontFile = $_SERVER["DOCUMENT_ROOT"] . "/fonts/arial.ttf";

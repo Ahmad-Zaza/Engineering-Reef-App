@@ -30,6 +30,10 @@
         <span>- {{ $result[0]->deal_engineer_num }} :</span>
         <span>{{ $result[0]->deal_engineer_name }}</span>
         <span>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</span>
+        <span>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</span>
+        <span>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</span>
+        حتى الشهر 
+        <span>{{ $month ." - ". $year }}</span>
     </h3>
     <table cellpadding="2" border="1" style="border-collapse: collapse;font-size:12px" width="100%">
         <thead>

@@ -63,6 +63,7 @@
                             $months = Db::table('deals')
                                 ->distinct('close_month')
                                 ->select('close_month')
+                                ->orderby('close_month')
                                 ->get()
                                 ->pluck('close_month');
                         @endphp
@@ -99,6 +100,7 @@
                             $years = Db::table('deals')
                                 ->distinct('close_year')
                                 ->select('close_year')
+                                ->orderby('close_year')
                                 ->get()
                                 ->pluck('close_year');
                         @endphp
