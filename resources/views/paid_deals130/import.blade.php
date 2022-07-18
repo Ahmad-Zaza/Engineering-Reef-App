@@ -138,7 +138,7 @@
                         لذلك الرجاء تقسيم الملف إلى 1000 سجل في كل ملف<br />
                         * بنية الجدول: السطر الأول هو الـ Heading والأسطر التالية هي التي ستحتوي على البيانات <br />
                         * إذا احتوى الملف على معاملة موجودة سابقا سيتم تخطيها أثناء الاستيراد<br />
-                        * نموذج عن شكل ملف الاستيراد  يحتوي <a href='{{ url('/example.xlsx') }}' target='_blank' class='btn btn-primary'>تحميل</a>
+                        * نموذج عن شكل ملف الاستيراد  يحتوي <a href='{{ url('/paid_deals_template.xlsx') }}' target='_blank' class='btn btn-primary'>تحميل</a>
                     </div>
 
                     <div class='form-group'>

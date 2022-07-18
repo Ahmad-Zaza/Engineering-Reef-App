@@ -6,8 +6,12 @@
 <style>
     * {
         direction: rtl;
-        font-size: 10px;
+        font-size: 11px;
         box-sizing: border-box;
+    }
+    .studies td,.studies th{
+        border: 0.7px solid #494444;
+        vertical-align: center;
     }
 </style>
 @php
@@ -20,69 +24,79 @@
 @else
 
     <body>
-        <h3>
-            تاريخ المعاملة:
-            <span> {{ $deal->file_date }}</span>
-            <span>&emsp;&emsp;&emsp;&emsp;&emsp;</span>
-            رقم المعاملة:
-            <b>{{ $deal->file_num }}</b>
-            <span>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</span>
-            مهندس المعاملة:
-            <span>{{ $deal->file_engineer->name . ' - ' . $deal->file_engineer->num }}</span>
-        </h3>
-        <table cellpadding="2" border="0" style="border-collapse: collapse;margin:auto;" width="100%">
+        <table cellpadding="2" cellspacing="4" border="0" style="border-collapse: collapse;background-color: #f4f4f4;" width="100%">
             <tbody>
+                <tr nobr="true" style="">
+                    <td width="15%" style="font-family:arialbd;">تفاصيل المعاملة:</td>
+                    <td width="8%" style="border: 0.7px solid #494444;font-family:arialbd;background-color:white;">
+                        {{ $deal->file_num }}
+                    </td>
+                    <td width="20%" style="border: 0.7px solid #494444;font-family:arialbd;background-color:white;">
+                        {{ $deal->file_date }}
+                    </td>
+                    <td width="15%" style="font-family:arialbd;">مهندس المعاملة:</td>
+                    <td width="42%" style="font-family:arialbd;border: 0.7px solid #494444;background-color:white;">
+                        {{ $deal->file_engineer->name . ' - ' . $deal->file_engineer->num }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table cellpadding="2" cellspacing="4" border="0" style="border-collapse: collapse;margin:auto;" width="100%">
+            <tbody>
+                <tr>
+                    <td colspan="8" style="line-height:3px;"></td>
+                </tr>
                 <tr nobr="true">
-                    <td width="16%">صاحب العلاقة</td>
-                    <td border="1" width="16%">{{ $deal->owner_name }}</td>
+                    <td width="16%" style="font-family:arialbd;">صاحب العلاقة</td>
+                    <td style="border: 0.7px solid #494444;" width="16%">{{ $deal->owner_name }}</td>
                     <td width="2%"></td>
-                    <td width="16%">منطقة حصر العقار</td>
-                    <td border="1" width="16%">{{ $deal->confinement_area }}</td>
+                    <td width="16%" style="font-family:arialbd;">منطقة حصر العقار</td>
+                    <td style="border: 0.7px solid #494444;" width="16%">{{ $deal->confinement_area }}</td>
                     <td width="2%"></td>
-                    <td width="16%">نوع الرخصة</td>
-                    <td border="1" width="16%">{{ $deal->file_type }}</td>
+                    <td width="16%" style="font-family:arialbd;">نوع الرخصة</td>
+                    <td style="border: 0.7px solid #494444;" width="16%">{{ $deal->file_type }}</td>
                 </tr>
                 <tr>
-                    <td colspan="6"></td>
+                    <td colspan="8" style="line-height:0px;"></td>
                 </tr>
                 <tr nobr="true">
-                    <td width="16%">المنطقة العقارية</td>
-                    <td border="1" width="16%">{{ $deal->real_estate_area }}</td>
+                    <td width="16%" style="font-family:arialbd;">المنطقة العقارية</td>
+                    <td style="border: 0.7px solid #494444;" width="16%">{{ $deal->real_estate_area }}</td>
                     <td width="2%"></td>
-                    <td width="16%">عدد الطوابق</td>
-                    <td border="1" width="16%">{{ $deal->floors_count }}</td>
+                    <td width="16%" style="font-family:arialbd;">عدد الطوابق</td>
+                    <td style="border: 0.7px solid #494444;" width="16%">{{ $deal->floors_count }}</td>
                     <td width="2%"></td>
-                    <td width="16%">المساحة الإجمالية</td>
-                    <td border="1" width="16%">{{ $deal->total_space }}</td>
+                    <td width="16%" style="font-family:arialbd;">المساحة الإجمالية</td>
+                    <td style="border: 0.7px solid #494444;" width="16%">{{ $deal->total_space }}</td>
                 </tr>
                 <tr>
-                    <td colspan="6"></td>
+                    <td colspan="8" style="line-height:0px;"></td>
                 </tr>
                 <tr nobr="true">
-                    <td width="16%">أرقام العقارات</td>
-                    <td border="1" width="16%">{{ $deal->real_estate_num }}</td>
+                    <td width="16%" style="font-family:arialbd;">أرقام العقارات</td>
+                    <td style="border: 0.7px solid #494444;" width="16%">{{ $deal->real_estate_num }}</td>
                     <td width="2%"></td>
-                    <td width="16%">تاريخ المذكرة ورقمها</td>
-                    <td border="1" width="16%">
+                    <td width="16%" style="font-family:arialbd;">تاريخ المذكرة ورقمها</td>
+                    <td style="border: 0.7px solid #494444;" width="16%">
                         {{ $deal->note_num ? $deal->note_num . ' - ' . $deal->note->date : '' }}</td>
                     <td width="2%"></td>
-                    <td width="16%">مجموع الرخصة</td>
-                    <td border="1" width="16%">{{ $deal->license_sum }}</td>
+                    <td width="16%" style="font-family:arialbd;">مجموع الرخصة</td>
+                    <td style="border: 0.7px solid #494444;" width="16%">{{ $deal->license_sum }}</td>
                 </tr>
 
             </tbody>
         </table>
         <br>
         <br>
-        <table cellpadding="2" border="1" style="border-collapse: collapse;margin:auto;" width="100%">
+        <table class="studies" cellpadding="2" border="0" style="border-collapse: collapse;border: 0.7px solid #494444;" width="100%">
             <thead>
                 <tr>
-                    <th align="center">نوع الدراسة</th>
-                    <th align="center">رقم المهندس</th>
-                    <th align="center">اسم المهندس</th>
-                    <th align="center">الأتعاب</th>
-                    <th align="center">اضبارة</th>
-                    <th align="center">مقيم</th>
+                    <th align="center" style="font-family:arialbd;">نوع الدراسة</th>
+                    <th align="center" style="font-family:arialbd;">رقم المهندس</th>
+                    <th align="center" style="font-family:arialbd;">اسم المهندس</th>
+                    <th align="center" style="font-family:arialbd;">الأتعاب</th>
+                    <th align="center" style="font-family:arialbd;">اضبارة</th>
+                    <th align="center" style="font-family:arialbd;">مقيم</th>
                 </tr>
 
             </thead>
@@ -94,23 +108,26 @@
                                 <td rowspan="{{ count($item['items']) + 1 }}" align="center">{{ $study_name }}
                                 </td>
                             @endif
-                            <td>{{ $subitem->study_engineer->num }}</td>
-                            <td>{{ $subitem->study_engineer->name }}</td>
-                            <td>{{ $subitem->study_value }}</td>
-                            <td>{{ $subitem->study_file_value }}</td>
-                            <td>{{ $subitem->study_resident_value }}</td>
+                            <td align="center">{{ $subitem->study_engineer->num }}</td>
+                            <td align="center">{{ $subitem->study_engineer->name }}</td>
+                            <td align="center">{{ $subitem->study_value }}</td>
+                            <td align="center">{{ $subitem->study_file_value }}</td>
+                            <td align="center">{{ $subitem->study_resident_value }}</td>
                         </tr>
                     @endforeach
                     <tr nobr="true">
-                        <td colspan="2">
+                        <td align="center" colspan="2" style="font-family:arialbd;">
                             المجموع
                         </td>
-                        <td style="background-color: rgb(131, 131, 131)">
+                        <td align="center" style="font-family:arialbd;background-color: #f4f4f4">
                             {{ $item['total_study'] > 0 ? $item['total_study'] : '' }}</td>
-                        <td style="background-color: rgb(131, 131, 131)">
+                        <td align="center" style="font-family:arialbd;background-color: #f4f4f4">
                             {{ $item['total_file'] > 0 ? $item['total_file'] : '' }}</td>
-                        <td style="font-weight:bold;background-color: rgb(131, 131, 131)">
+                        <td align="center" style="font-family:arialbd;background-color: #f4f4f4">
                             {{ $item['total_resident'] > 0 ? $item['total_resident'] : '' }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" style="line-height:0px;"></td>
                     </tr>
                 @endforeach
             </tbody>

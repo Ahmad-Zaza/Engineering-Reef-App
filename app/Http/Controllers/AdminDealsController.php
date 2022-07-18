@@ -608,13 +608,21 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
                 $pdf->setRTL(true);
                 //set margins
                 $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-                $pdf->SetPrintHeader(false);
+                $pdf->SetPrintHeader(true);
+                $pdf->SetMargins(PDF_MARGIN_LEFT, 18, PDF_MARGIN_RIGHT);
 
+                //arialbd
+                // convert TTF font to TCPDF format and store it on the fonts folder
+                $fontFile = $_SERVER["DOCUMENT_ROOT"] . "/fonts/arialbd.ttf";
+                $fontname = TCPDF_FONTS::addTTFfont($fontFile, 'TrueTypeUnicode', '');
+                // use the font
+                $pdf->SetFont($fontname, '', 12, '', false);
                 // convert TTF font to TCPDF format and store it on the fonts folder
                 $fontFile = $_SERVER["DOCUMENT_ROOT"] . "/fonts/arial.ttf";
                 $fontname = TCPDF_FONTS::addTTFfont($fontFile, 'TrueTypeUnicode', '');
                 // use the font
-                $pdf->SetFont($fontname, '', 10, '', false);
+                $pdf->SetFont($fontname, '', 12, '', false);
+
 
                 $pdf->AddPage();
                 $pdf->setPrintFooter(true);

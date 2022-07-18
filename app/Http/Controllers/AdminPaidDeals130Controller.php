@@ -426,7 +426,11 @@ class AdminPaidDeals130Controller extends \crocodicstudio_voila\crudbooster\cont
         $engineers = DB::table('cms_users')->where("id_cms_privileges", 2)->pluck("id", "num")->toArray();
         $deals = DB::table('deals')->pluck("id", "file_num")->toArray();
         foreach ($rows as $value) {
-            if (!$value["rkm_almaaaml"] || !$engineers[$value["rkm_almhnds"]] || !$deals[$value["rkm_almaaaml"]]) {
+            if (!$value["rkm_almaaaml"] || !$value["rkm_almhnds"]) {
+                continue;
+            }
+            $total_file_records++;
+            if (!$engineers[$value["rkm_almhnds"]] || !$deals[$value["rkm_almaaaml"]]) {
                 $failedError[] = $value->toArray();
                 $total_failed++;
                 continue;
@@ -446,7 +450,6 @@ class AdminPaidDeals130Controller extends \crocodicstudio_voila\crudbooster\cont
             ];
 
             try {
-                $total_file_records++;
                 PaidDeal::create($paidDealData);
                 $total_successfully++;
                 Cache::increment('success_' . $file_md5);
@@ -458,11 +461,12 @@ class AdminPaidDeals130Controller extends \crocodicstudio_voila\crudbooster\cont
                 Cache::put('error_' . $file_md5, $e, 500);
             }
         }
+        // dd($failedError);
         $operation->update([
             "total_file_records" => $total_file_records,
             "total_successfully" => $total_successfully,
             "total_failed" => $total_failed,
-            // "failed_errors" => json_encode($failedError),
+            "failed_errors" => json_encode($failedError),
         ]);
         return response()->json(['status' => true]);
     }
@@ -528,7 +532,8 @@ class AdminPaidDeals130Controller extends \crocodicstudio_voila\crudbooster\cont
                 $pdf->setRTL(true);
                 //set margins
                 $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-                $pdf->SetPrintHeader(false);
+                $pdf->SetPrintHeader(true);
+                $pdf->SetMargins(10, 18, 10);
 
                 // convert TTF font to TCPDF format and store it on the fonts folder
                 $fontFile = $_SERVER["DOCUMENT_ROOT"] . "/fonts/arial.ttf";

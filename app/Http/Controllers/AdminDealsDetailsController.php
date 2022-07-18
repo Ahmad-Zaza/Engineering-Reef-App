@@ -451,8 +451,9 @@ class AdminDealsDetailsController extends \crocodicstudio_voila\crudbooster\cont
         //After Write
         $pdf->setRTL(true);
         //set margins
-        // $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-        $pdf->SetPrintHeader(false);
+        $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+        $pdf->SetPrintHeader(true);
+        $pdf->SetMargins(10, 18, 10);
 
         // convert TTF font to TCPDF format and store it on the fonts folder
         $fontFile = $_SERVER["DOCUMENT_ROOT"] . "/fonts/arial.ttf";
@@ -487,19 +488,11 @@ class MYPDF extends TCPDF
     }
 
     public function Header(){
-        $fontFile = $_SERVER["DOCUMENT_ROOT"] . "/fonts/arial.ttf";
+        $fontFile = $_SERVER["DOCUMENT_ROOT"] . "/fonts/arialbd.ttf";
         $fontname = TCPDF_FONTS::addTTFfont($fontFile, 'TrueTypeUnicode', '');
         // // use the font
-        $this->SetFont($fontname, '', 10, '', false);
-        // $image_file = "images/portfolio_logo.png";
-        // $this->Image($image_file, 10, 10, 15, '', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
-        // Title
-        // $this->Image($image_file, 10, 10, 15, '', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+        $this->SetFont($fontname, '', 14, '', false);
 
-        // $this->Image($image_file, 10, 10, 15, '', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
-        // Title
-        // $this->Cell(0, 15, '<< TCPDF Example 003 >>', 0, false, 'L', 0, '', 0, false, 'M', 'M');
-
-        $this->Cell(0, 15, 'نقابة المـهـنـدسـيـن فرع ريف دمشق', 0, false, 'C', 0, '', 0, false, 'T', 'M');
+        $this->Cell(0, 20, 'نقابة المـهـنـدسـيـن فرع ريف دمشق', 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
 }

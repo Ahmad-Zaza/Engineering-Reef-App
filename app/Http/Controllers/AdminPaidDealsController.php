@@ -423,7 +423,11 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
         $engineers = DB::table('cms_users')->where("id_cms_privileges", 2)->pluck("id", "num")->toArray();
         $deals = DB::table('deals')->pluck("id", "file_num")->toArray();
         foreach ($rows as $value) {
-            if (!$value["rkm_almaaaml"] || !$engineers[$value["rkm_almhnds"]] || !$deals[$value["rkm_almaaaml"]]) {
+            if (!$value["rkm_almaaaml"] || !$value["rkm_almhnds"]) {
+                continue;
+            }
+            $total_file_records++;
+            if (!$engineers[$value["rkm_almhnds"]] || !$deals[$value["rkm_almaaaml"]]) {
                 $failedError[] = $value->toArray();
                 $total_failed++;
                 continue;
@@ -443,7 +447,6 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
             ];
 
             try {
-                $total_file_records++;
                 PaidDeal::create($paidDealData);
                 $total_successfully++;
                 Cache::increment('success_' . $file_md5);
@@ -525,7 +528,8 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
                 $pdf->setRTL(true);
                 //set margins
                 $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-                $pdf->SetPrintHeader(false);
+                $pdf->SetPrintHeader(true);
+                $pdf->SetMargins(PDF_MARGIN_LEFT, 18, PDF_MARGIN_RIGHT);
 
                 // convert TTF font to TCPDF format and store it on the fonts folder
                 $fontFile = $_SERVER["DOCUMENT_ROOT"] . "/fonts/arial.ttf";

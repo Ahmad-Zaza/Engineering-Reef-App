@@ -379,7 +379,8 @@ class AdminDealDetails133Controller extends \crocodicstudio_voila\crudbooster\co
                 $pdf->setRTL(true);
                 //set margins
                 $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-                $pdf->SetPrintHeader(false);
+                $pdf->SetPrintHeader(true);
+                $pdf->SetMargins(10, 18, 10);
 
                 // convert TTF font to TCPDF format and store it on the fonts folder
                 $fontFile = $_SERVER["DOCUMENT_ROOT"] . "/fonts/arial.ttf";

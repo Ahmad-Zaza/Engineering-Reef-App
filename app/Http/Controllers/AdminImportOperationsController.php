@@ -4,6 +4,7 @@ use App\Http\Models\Deal;
 use App\Http\Models\DealDetail;
 use App\Http\Models\FinancialDeal;
 use App\Http\Models\ImportOperation;
+use App\Http\Models\PaidDeal;
 use CRUDBooster;
 use Illuminate\Support\Facades\DB;
 
@@ -334,8 +335,8 @@ class AdminImportOperationsController extends \crocodicstudio_voila\crudbooster\
     public function hook_after_delete($id)
     {
         //Your code here
-        $operation = ImportOperation::where("id", $id)->first();
 		FinancialDeal::where("operation_id", $id)->delete();
+		PaidDeal::where("operation_id", $id)->delete();
 		Deal::where("operation_id", $id)->delete();
 		DealDetail::where("operation_id", $id)->delete();
     }
