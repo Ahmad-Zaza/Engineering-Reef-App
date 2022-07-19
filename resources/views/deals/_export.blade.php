@@ -37,7 +37,7 @@
         <tbody>
             <tr nobr="true">
                 @if (Request::has('close_year') && Request::has('close_month'))
-                    <td border="0" style="font-size:10px;background-color: #f4f4f4;font-weight: bold">
+                    <td border="0" style="font-size:10px;background-color: #9b9999;font-weight: bold">
                         {{ $result[0]->close_year . ' | ' . $result[0]->close_month }}
                     </td>
                 @else
@@ -46,10 +46,10 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td border="1" style="background-color: #f4f4f4;">المجموع الكلي</td>
-                <td border="1" style="background-color: #f4f4f4;">{{ $total['total_study_sum'] }}</td>
-                <td border="1" style="background-color: #f4f4f4;">{{ $total['total_file_sum'] }}</td>
-                <td border="1" style="background-color: #f4f4f4;">{{ $total['total_resident_sum'] }}</td>
+                <td border="1" style="background-color: #9b9999;">المجموع الكلي</td>
+                <td border="1" style="background-color: #9b9999;">{{ $total['total_study_sum'] }}</td>
+                <td border="1" style="background-color: #9b9999;">{{ $total['total_file_sum'] }}</td>
+                <td border="1" style="background-color: #9b9999;">{{ $total['total_resident_sum'] }}</td>
             </tr>
         </tbody>
     </table>
@@ -72,8 +72,8 @@
                             <tbody>
                                 <tr nobr="true">
                                     <td>المعاملة</td>
-                                    <td border="1" style="background-color: #f4f4f4;">{{ $row->file_num }}</td>
-                                    <td border="1" style="background-color: #f4f4f4;">{{ $row->file_date }}</td>
+                                    <td border="1" style="background-color: #9b9999;">{{ $row->file_num }}</td>
+                                    <td border="1" style="background-color: #9b9999;">{{ $row->file_date }}</td>
                                     <td border="1">{{ $row->file_type }}</td>
                                     <td>مذكرة</td>
                                     <td border="1">
@@ -117,10 +117,10 @@
                         <table cellpadding="3" style="border-collapse: collapse;font-size:8px" width="100%">
                             <tbody>
                                 <tr nobr="true">
-                                    <td border="1" style="background-color: #f4f4f4;">اسم الدراسة</td>
-                                    <td border="1" style="background-color: #f4f4f4;">دراسة</td>
-                                    <td border="1" style="background-color: #f4f4f4;">إضبارة</td>
-                                    <td border="1" style="background-color: #f4f4f4;">مقيم</td>
+                                    <td border="1" style="background-color: #9b9999;">اسم الدراسة</td>
+                                    <td border="1" style="background-color: #9b9999;">دراسة</td>
+                                    <td border="1" style="background-color: #9b9999;">إضبارة</td>
+                                    <td border="1" style="background-color: #9b9999;">مقيم</td>
                                 </tr>
 
                                 @foreach ($row->deal_details as $row1)
@@ -135,10 +135,10 @@
                                     <td border="0"></td>
                                 </tr>
                                 <tr nobr="true">
-                                    <td border="1" style="background-color: #f4f4f4;">مجموع المعاملة</td>
-                                    <td border="1" style="background-color: #f4f4f4;">{{ $row->file_study_sum }}</td>
-                                    <td border="1" style="background-color: #f4f4f4;">{{ $row->file_file_sum }}</td>
-                                    <td border="1" style="background-color: #f4f4f4;">{{ $row->file_resident_sum }}
+                                    <td border="1" style="background-color: #9b9999;">مجموع المعاملة</td>
+                                    <td border="1" style="background-color: #9b9999;">{{ $row->file_study_sum }}</td>
+                                    <td border="1" style="background-color: #9b9999;">{{ $row->file_file_sum }}</td>
+                                    <td border="1" style="background-color: #9b9999;">{{ $row->file_resident_sum }}
                                     </td>
                                 </tr>
                             </tbody>

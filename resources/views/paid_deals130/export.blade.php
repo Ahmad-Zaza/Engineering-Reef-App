@@ -34,24 +34,25 @@
 @else
 
     <body>
-        <table cellpadding="2" cellspacing="4" border="0" style="border-collapse: collapse;background-color: #f4f4f4;"
+        <table cellpadding="2" cellspacing="4" border="0" style="border-collapse: collapse;background-color: #9b9999;"
             width="100%">
             <tbody>
                 <tr nobr="true" style="">
-                    <td width="30%" style="font-family:arialbd;">
+                    <td width="20%" style="font-family:arialbd;">
                         إقامات المعاملات المسددة للمهندس:</td>
-                    <td width="10%" style="border: 0.7px solid #494444;font-family:arialbd;background-color:white;">
-                        {{ $result[0]->deal_engineer_num }}
+                    <td width="10.5%" style="border: 0.7px solid #494444;font-family:arialbd;background-color:white;">
+                        &nbsp;{{ $result[0]->deal_engineer_num }}&nbsp;
                     </td>
-                    <td width="30%" style="border: 0.7px solid #494444;font-family:arialbd;background-color:white;">
+                    <td width="31%" style="border: 0.7px solid #494444;font-family:arialbd;background-color:white;">
                         {{ $result[0]->deal_engineer_name }}
                     </td>
-                    <td width="5%" style="font-family:arialbd;">للشهر:</td>
-                    <td width="10%" style="font-family:arialbd;border: 0.7px solid #494444;background-color:white;">
+                    <td width="21.5%"></td>
+                    <td width="4%" style="font-family:arialbd;">للشهر:</td>
+                    <td width="4%" align="center" style="font-family:arialbd;border: 0.7px solid #494444;background-color:white;">
                         {{ $result[0]->deals_close_month }}
                     </td>
-                    <td width="5%" style="font-family:arialbd;">السنة:</td>
-                    <td width="10%" style="font-family:arialbd;border: 0.7px solid #494444;background-color:white;">
+                    <td width="4%" style="font-family:arialbd;">السنة:</td>
+                    <td width="5%" align="center" style="font-family:arialbd;border: 0.7px solid #494444;background-color:white;">
                         {{ $result[0]->deals_close_year }}
                     </td>
                 </tr>
@@ -67,7 +68,7 @@
         </table>
         <table class="main" cellpadding="2" border="1" style="border-collapse: collapse;" width="100%">
             <thead>
-                <tr style="background-color: #f4f4f4;">
+                <tr style="background-color: #9b9999;">
                     <th>رقم المذكرة</th>
                     <th>تاريخ المذكرة</th>
                     <th>رقم المعاملة</th>
@@ -85,7 +86,7 @@
                     @php
                         $style = '';
                         if ($loop->iteration % 2 == 0) {
-                            $style="background-color: #f4f4f4;";
+                            $style="background-color: #9b9999;";
                         }
                     @endphp
                     <tr style="{{ $style }}">

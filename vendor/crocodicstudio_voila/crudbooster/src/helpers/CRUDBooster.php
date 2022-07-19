@@ -132,24 +132,22 @@ class CRUDBooster
     //fesal
     public static function getResizeImage($img, $width = null, $height = null)
     {
-    	
-    	if($img==null || $img==''){
-    	   
-    	   return url('vendor/crudbooster/avatar.jpg');
 
-    	}
-    	
-    	
+        if ($img == null || $img == '') {
+
+            return url('vendor/crudbooster/avatar.jpg');
+
+        }
+
         $name_image = 'R' . $width . 'x' . $height . str_replace("/", "_", $img);
-        
-        if(file_exists(public_path('/thumbs/____resize____/' . $name_image))){
+
+        if (file_exists(public_path('/thumbs/____resize____/' . $name_image))) {
             return url('thumbs/____resize____/' . $name_image);
         }
-        
-         if(!file_exists(public_path("$img")))
-            {
-            	return url('vendor/crudbooster/avatar.jpg');
-            }
+
+        if (!file_exists(public_path("$img"))) {
+            return url('vendor/crudbooster/avatar.jpg');
+        }
 
         $imgInfo = getimagesize(public_path("$img"));
 
@@ -183,10 +181,9 @@ class CRUDBooster
             if (!file_exists(public_path('/thumbs'))) {
                 mkdir(public_path('/thumbs'), 777, true);
             }
-            
-            if(!file_exists(public_path("$img")))
-            {
-            	return url('vendor/crudbooster/avatar.jpg');
+
+            if (!file_exists(public_path("$img"))) {
+                return url('vendor/crudbooster/avatar.jpg');
             }
 
             $img = Image::make(public_path("$img"))->resize($nWidth, $nHeight);
@@ -205,21 +202,20 @@ class CRUDBooster
     //fesal
     public static function getCropImage($img, $width = 100, $height = 100)
     {
-    
-    	if($img==null || $img==''){
-    	   
-    	   return url('vendor/crudbooster/avatar.jpg');
 
-    	}
-    	
+        if ($img == null || $img == '') {
+
+            return url('vendor/crudbooster/avatar.jpg');
+
+        }
+
         $name_image = 'R' . $width . 'x' . $height . str_replace("/", "_", $img);
 
-        if(file_exists(public_path('/thumbs/____crop____/' . $name_image))){
+        if (file_exists(public_path('/thumbs/____crop____/' . $name_image))) {
             return url('thumbs/____crop____/' . $name_image);
         }
 
-
-        $img=CRUDBooster::resizeForCrop($img,$width,$height);
+        $img = CRUDBooster::resizeForCrop($img, $width, $height);
 
         $name_image = 'C' . $width . 'x' . $height . str_replace("/", "_", $img);
 
@@ -228,9 +224,8 @@ class CRUDBooster
                 mkdir(public_path('/thumbs'), 777, true);
             }
 
-	   if(!file_exists(public_path("$img")))
-            {
-            	return url('vendor/crudbooster/avatar.jpg');
+            if (!file_exists(public_path("$img"))) {
+                return url('vendor/crudbooster/avatar.jpg');
             }
 
             $img = Image::make(public_path("$img"))->crop($width, $height);
@@ -247,25 +242,22 @@ class CRUDBooster
 
     public static function resizeForCrop($img, $width = null, $height = null)
     {
-    
-    	if($img==null || $img==''){
-    	   
-    	   return url('vendor/crudbooster/avatar.jpg');
 
-    	}
-    	
-    	
+        if ($img == null || $img == '') {
+
+            return url('vendor/crudbooster/avatar.jpg');
+
+        }
+
         $name_image = 'RC' . $width . 'x' . $height . str_replace("/", "_", $img);
 
         // if(file_exists(public_path('/thumbs/____resize____/' . $name_image))){
         //     dd(public_path('/thumbs/____resize____/' . $name_image));
         //     return url('thumbs/____resize____/' . $name_image);
         // }
-        if(!file_exists(public_path("$img")))
-            {
-            	return url('vendor/crudbooster/avatar.jpg');
-            }
-        
+        if (!file_exists(public_path("$img"))) {
+            return url('vendor/crudbooster/avatar.jpg');
+        }
 
         $imgInfo = getimagesize(public_path("$img"));
 
@@ -285,7 +277,6 @@ class CRUDBooster
             return $img;
         } else {
 
-
             //yeah, resize it, but keep it proportional
             $rate = (($width / $imgInfo[0]) < ($height / $imgInfo[1])) ? ($width / $imgInfo[0]) : ($height / $imgInfo[1]);
             $nWidth = $imgInfo[0] * $rate;
@@ -295,37 +286,34 @@ class CRUDBooster
             $nHeight = round($nHeight);
             if ($nWidth < $width || $nHeight < $height) {
                 if ($nWidth < $width) {
-                    $rate=$width / $imgInfo[0];
-                   
+                    $rate = $width / $imgInfo[0];
+
                 }
 
                 if ($nHeight < $height) {
-                    
-                    $rate=$height / $imgInfo[1];
+
+                    $rate = $height / $imgInfo[1];
                     // dd($nWidth." ".$width." / ". $nHeight." ".$height." rate ".$rate);
-                    
+
                 }
 
                 $nWidth = $imgInfo[0] * $rate;
                 $nHeight = $imgInfo[1] * $rate;
-    
+
                 $nWidth = round($nWidth);
                 $nHeight = round($nHeight);
             }
         }
-       
 
-       
         if (!file_exists(public_path('thumbs/____resize____/' . $name_image))) {
             if (!file_exists(public_path('/thumbs'))) {
                 mkdir(public_path('/thumbs'), 777, true);
             }
-            
-            if(!file_exists(public_path("$img")))
-            {
-            	return url('vendor/crudbooster/avatar.jpg');
+
+            if (!file_exists(public_path("$img"))) {
+                return url('vendor/crudbooster/avatar.jpg');
             }
-            
+
             $img = Image::make(public_path("$img"))->resize($nWidth, $nHeight);
 
             if (!file_exists(public_path('/thumbs/____resize____/'))) {

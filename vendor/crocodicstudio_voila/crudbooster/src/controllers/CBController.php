@@ -588,7 +588,8 @@ class CBController extends Controller
 
                         //fesal resize image
                         $path = CRUDBooster::getCropImage($value, 50, 50);
-                        $value = "<a data-lightbox='roadtrip'  rel='group_{{$table}}' title='$label: $title' href='" . $pic . "'><img  src='" . $path . "'/></a>";
+                        // $value = "<a data-lightbox='roadtrip'  rel='group_{{$table}}' title='$label: $title' href='" . $pic . "'><img  src='" . $path . "'/></a>";
+                        $value = "<a data-lightbox='roadtrip'  rel='group_{{$table}}' title='$label: $title' href='" . $pic . "'><img  src='" . $path . "' width='40px' height='40px' style='object-fit:fill;'/></a>";
                     }
                 }
 
