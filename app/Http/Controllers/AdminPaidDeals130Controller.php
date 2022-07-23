@@ -38,7 +38,7 @@ class AdminPaidDeals130Controller extends \crocodicstudio_voila\crudbooster\cont
         $this->button_show = false;
         $this->button_filter = true;
         $this->button_export = true;
-        $this->button_import = true;
+        $this->button_import = CRUDBooster::me()->id_cms_privileges == 1;
         $this->button_bulk_action = true;
         $this->sidebar_mode = "normal"; //normal,mini,collapse,collapse-mini
         # END CONFIGURATION DO NOT REMOVE THIS LINE
@@ -209,6 +209,24 @@ class AdminPaidDeals130Controller extends \crocodicstudio_voila\crudbooster\cont
          */
         $this->load_css = array();
 
+    }
+
+    public function getIndex()
+    {
+        if (!Request::get("month") && !Request::get("year")) {
+            $month = Db::table('paid_deals')
+                ->distinct('month')
+                ->select('month')
+                ->orderby('month', "desc")
+                ->first();
+            $year = Db::table('paid_deals')
+                ->distinct('year')
+                ->select('year')
+                ->orderby('year', "desc")
+                ->first();
+            return redirect(CrudBooster::adminPath('paid_deals130') . "?month=" . $month->month . "&year=" . $year->year);
+        }
+        return parent::getIndex();
     }
 
     /*

@@ -37,7 +37,7 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
         $this->button_detail = false;
         $this->button_show = true;
         $this->button_filter = true;
-        $this->button_import = true;
+        $this->button_import = CRUDBooster::me()->id_cms_privileges == 1;
         $this->button_export = true;
         $this->table = "financial_deals";
         # END CONFIGURATION DO NOT REMOVE THIS LINE
@@ -232,6 +232,24 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
          */
         $this->load_css = array();
 
+    }
+
+    public function getIndex()
+    {
+        if (!Request::get("month") && !Request::get("year")) {
+            $month = Db::table('financial_deals')
+                ->distinct('financial_month')
+                ->select('financial_month')
+                ->orderby('financial_month', "desc")
+                ->first();
+            $year = Db::table('financial_deals')
+                ->distinct('financial_year')
+                ->select('financial_year')
+                ->orderby('financial_year', "desc")
+                ->first();
+            return redirect(CrudBooster::adminPath('monthly_amounts') . "?month=" . $month->financial_month . "&year=" . $year->financial_year);
+        }
+        return parent::getIndex();
     }
 
     /*

@@ -123,12 +123,12 @@
 
                     <div class="input-group" style="width: 170px">
                         @php
-                            $months = Db::table('paid_deals')
-                                ->distinct('month')
-                                ->select('month')
-                                ->orderby('month')
+                            $months = Db::table('deals')
+                                ->distinct('close_month')
+                                ->select('close_month')
+                                ->orderby('close_month')
                                 ->get()
-                                ->pluck('month');
+                                ->pluck('close_month');
                         @endphp
                         <select name="month" id="month"
                             class="form-control input-sm pull-{{ trans('crudbooster.right') }}">
@@ -160,12 +160,12 @@
                     </div>
                     <div class="input-group" style="width: 170px">
                         @php
-                            $years = Db::table('paid_deals')
-                                ->distinct('year')
-                                ->select('year')
-                                ->orderby('year')
+                            $years = Db::table('deals')
+                                ->distinct('close_year')
+                                ->select('close_year')
+                                ->orderby('close_year')
                                 ->get()
-                                ->pluck('year');
+                                ->pluck('close_year');
                         @endphp
                         <select name="year" id="year"
                             class="form-control input-sm pull-{{ trans('crudbooster.right') }}">

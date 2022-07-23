@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
-use TCPDF;
 use TCPDF_FONTS;
 
 class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers\CBController
@@ -44,7 +43,6 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
         $this->button_show = true;
         $this->button_filter = false;
         $this->button_import = CRUDBooster::me()->id_cms_privileges == 1;
-        // $this->button_import = true;
         $this->button_export = true;
         $this->show_numbering = true;
         $this->table = "deals";
@@ -254,6 +252,23 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
 
     }
 
+    public function getIndex()
+    {
+        if (!Request::get("month") && !Request::get("year")) {
+            $month = Db::table('deals')
+                ->distinct('close_month')
+                ->select('close_month')
+                ->orderby('close_month', "desc")
+                ->first();
+            $year = Db::table('deals')
+                ->distinct('close_year')
+                ->select('close_year')
+                ->orderby('close_year', "desc")
+                ->first();
+            return redirect(CrudBooster::adminPath('deals') . "?month=" . $month->close_month . "&year=" . $year->close_year);
+        }
+        return parent::getIndex();
+    }
     /*
     | ----------------------------------------------------------------------
     | Hook for button selected
@@ -277,6 +292,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
      */
     public function hook_query_index(&$query)
     {
+
         $query->leftjoin("deal_details", "deal_details.deal_id", "=", "deals.id");
         $query->leftjoin("cms_users as study_user", "deal_details.study_engineer_id", "=", "study_user.id");
         if (CrudBooster::me()->id_cms_privileges == 2) {
@@ -522,10 +538,9 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
                 if (!$deals[$value["rkm_almaaaml"]]) {
                     $deal = Deal::create($dealData);
                     $deals[$value["rkm_almaaaml"]] = $deal->id;
-                    DealDetail::where("deal_id",$deal->id)->delete();
-                } 
-                else {
-                    Deal::where("id",$deals[$value["rkm_almaaaml"]])->update($dealData);
+                    DealDetail::where("deal_id", $deal->id)->delete();
+                } else {
+                    Deal::where("id", $deals[$value["rkm_almaaaml"]])->update($dealData);
                 }
                 $dealDetailsData["deal_id"] = $deals[$value["rkm_almaaaml"]];
                 DB::table("deal_details")->insert($dealDetailsData);
@@ -622,7 +637,6 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
                 $fontname = TCPDF_FONTS::addTTFfont($fontFile, 'TrueTypeUnicode', '');
                 // use the font
                 $pdf->SetFont($fontname, '', 12, '', false);
-
 
                 $pdf->AddPage();
                 $pdf->setPrintFooter(true);

@@ -211,6 +211,23 @@ class AdminDealDetails131Controller extends \crocodicstudio_voila\crudbooster\co
 
     }
 
+    public function getIndex()
+    {
+        if (!Request::get("month") && !Request::get("year")) {
+            $month = Db::table('deals')
+                ->distinct('close_month')
+                ->select('close_month')
+                ->orderby('close_month', "desc")
+                ->first();
+            $year = Db::table('deals')
+                ->distinct('close_year')
+                ->select('close_year')
+                ->orderby('close_year', "desc")
+                ->first();
+            return redirect(CrudBooster::adminPath('deal_details131') . "?month=" . $month->close_month . "&year=" . $year->close_year);
+        }
+        return parent::getIndex();
+    }
     /*
     | ----------------------------------------------------------------------
     | Hook for button selected
