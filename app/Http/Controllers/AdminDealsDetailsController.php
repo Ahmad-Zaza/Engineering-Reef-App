@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace App\Http\Controllers;
 
 use App\Http\Models\Deal;
@@ -6,7 +6,6 @@ use App\Http\Models\DealDetail;
 use crocodicstudio_voila\crudbooster\helpers\CRUDBooster;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
-use Maatwebsite\Excel\Facades\Excel;
 use TCPDF;
 use TCPDF_FONTS;
 
@@ -225,17 +224,21 @@ class AdminDealsDetailsController extends \crocodicstudio_voila\crudbooster\cont
     public function getIndex()
     {
         if (!Request::get("month") && !Request::get("year")) {
-            $month = Db::table('deals')
+            $month = Db::table('deals')->where("deleted_at",null)
                 ->distinct('close_month')
+                ->whereNotNull('close_month')
                 ->select('close_month')
                 ->orderby('close_month', "desc")
                 ->first();
-            $year = Db::table('deals')
+            $year = Db::table('deals')->where("deleted_at",null)
                 ->distinct('close_year')
+                ->whereNotNull('close_year')
                 ->select('close_year')
                 ->orderby('close_year', "desc")
                 ->first();
-            return redirect(CrudBooster::adminPath('deal_details') . "?month=" . $month->close_month . "&year=" . $year->close_year);
+            if ($month->close_month && $year->close_year) {
+                return redirect(CrudBooster::adminPath('deal_details') . "?month=" . $month->close_month . "&year=" . $year->close_year);
+            }
         }
         return parent::getIndex();
     }
@@ -438,10 +441,12 @@ class AdminDealsDetailsController extends \crocodicstudio_voila\crudbooster\cont
     {
         ini_set('memory_limit', '-1');
         set_time_limit(0);
-        $deal = Deal::where("id", $id)->with("file_engineer")->first();
+        $deal = Deal::where("id", $id)->whereNull("deleted_at")->with("file_engineer")->first();
         $details = [];
         $deal_details = DealDetail::where("deal_id", $id)
             ->with("study_engineer")
+            ->leftjoin("study_types", "deal_details.study_name", "=", "study_types.name")
+            ->orderby("study_types.sorting","asc")
             ->get();
         foreach ($deal_details as $item) {
             if (!$details[$item->study_name]) {
@@ -450,9 +455,9 @@ class AdminDealsDetailsController extends \crocodicstudio_voila\crudbooster\cont
                 $details[$item->study_name]["total_resident"] = 0;
             }
             $details[$item->study_name]["items"][] = $item;
-			$details[$item->study_name]["total_study"] += $item->study_value;
-			$details[$item->study_name]["total_file"] += $item->study_file_value;
-			$details[$item->study_name]["total_resident"] += $item->study_resident_value;
+            $details[$item->study_name]["total_study"] += $item->study_value;
+            $details[$item->study_name]["total_file"] += $item->study_file_value;
+            $details[$item->study_name]["total_resident"] += $item->study_resident_value;
         }
         $pdf = new MYPDF("P", PDF_UNIT, "A4", true, 'UTF-8', false);
         $lg = array();
@@ -503,7 +508,8 @@ class MYPDF extends TCPDF
         $this->Cell(0, 10, $this->getAliasNumPage() . '/' . $this->getAliasNbPages() . " " . 'صفحة', 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
 
-    public function Header(){
+    public function Header()
+    {
         $fontFile = $_SERVER["DOCUMENT_ROOT"] . "/fonts/arialbd.ttf";
         $fontname = TCPDF_FONTS::addTTFfont($fontFile, 'TrueTypeUnicode', '');
         // // use the font

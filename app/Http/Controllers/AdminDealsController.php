@@ -255,17 +255,22 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
     public function getIndex()
     {
         if (!Request::get("month") && !Request::get("year")) {
-            $month = Db::table('deals')
+            $month = Db::table('deals')->where("deleted_at",null)
                 ->distinct('close_month')
+                ->whereNotNull('close_month')
                 ->select('close_month')
                 ->orderby('close_month', "desc")
                 ->first();
-            $year = Db::table('deals')
+            $year = Db::table('deals')->where("deleted_at",null)
                 ->distinct('close_year')
+                ->whereNotNull('close_year')
                 ->select('close_year')
                 ->orderby('close_year', "desc")
                 ->first();
-            return redirect(CrudBooster::adminPath('deals') . "?month=" . $month->close_month . "&year=" . $year->close_year);
+            if ($month->close_month && $year->close_year) {
+                return redirect(CrudBooster::adminPath('deals') . "?month=" . $month->close_month . "&year=" . $year->close_year);
+            }
+
         }
         return parent::getIndex();
     }
@@ -295,6 +300,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
 
         $query->leftjoin("deal_details", "deal_details.deal_id", "=", "deals.id");
         $query->leftjoin("cms_users as study_user", "deal_details.study_engineer_id", "=", "study_user.id");
+        $query->leftjoin("study_types", "deal_details.study_name", "=", "study_types.name");
         if (CrudBooster::me()->id_cms_privileges == 2) {
             $query->where("deal_details.study_engineer_id", CrudBooster::me()->id);
         }
@@ -314,7 +320,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
             $query->where("deals.id", "-1");
         }
         $query->orderby("deals.file_num", "asc");
-        $query->orderby("deal_details.study_name", "asc");
+        $query->orderby("study_types.sorting", "asc");
     }
 
     /*
@@ -482,7 +488,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
             "total_studies_before" => DB::table('deal_details')->get()->count(),
         ]);
         $engineers = DB::table('cms_users')->where("id_cms_privileges", 2)->pluck("id", "num")->toArray();
-        $deals = DB::table('deals')->pluck("id", "file_num")->toArray();
+        $dealsArr = DB::table('deals')->where("deleted_at",null)->toArray();
         foreach ($rows as $value) {
             if (!$value["rkm_almaaaml"]) {
                 $failedError[] = $value;
@@ -535,12 +541,17 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
             ];
             try {
                 $total_file_records++;
-                if (!$deals[$value["rkm_almaaaml"]]) {
+                $deal = array_values(array_filter(
+                    $dealsArr,
+                    function ($item) use ($value) {
+                        return $item->file_num == intval($value["rkm_almaaaml"]) && $item->file_date == $value["tarykh_almaaaml"]->format("Y-m-d");
+                    }))[0];
+                if (!$deal) {
                     $deal = Deal::create($dealData);
                     $deals[$value["rkm_almaaaml"]] = $deal->id;
                     DealDetail::where("deal_id", $deal->id)->delete();
                 } else {
-                    Deal::where("id", $deals[$value["rkm_almaaaml"]])->update($dealData);
+                    Deal::where("id", $deal->id)->update($dealData);
                 }
                 $dealDetailsData["deal_id"] = $deals[$value["rkm_almaaaml"]];
                 DB::table("deal_details")->insert($dealDetailsData);
@@ -714,7 +725,8 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
                 ->where("deal_id", $row->id)
                 ->where("study_engineer_id", $study_engineer_id)
                 ->leftjoin("cms_users as study_user", "deal_details.study_engineer_id", "=", "study_user.id")
-                ->orderby("study_name", "asc")
+                ->leftjoin("study_types", "deal_details.study_name", "=", "study_types.name")
+                ->orderby("study_types.sorting", "asc")
                 ->get();
             $row->deal_details = $deal_details;
             $row->file_study_sum = 0;

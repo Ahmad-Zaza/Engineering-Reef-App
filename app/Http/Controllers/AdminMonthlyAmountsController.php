@@ -240,14 +240,19 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
             $month = Db::table('financial_deals')
                 ->distinct('financial_month')
                 ->select('financial_month')
+                ->whereNull("deleted_at")
                 ->orderby('financial_month', "desc")
                 ->first();
             $year = Db::table('financial_deals')
+                ->whereNull("deleted_at")
                 ->distinct('financial_year')
                 ->select('financial_year')
                 ->orderby('financial_year', "desc")
                 ->first();
-            return redirect(CrudBooster::adminPath('monthly_amounts') . "?month=" . $month->financial_month . "&year=" . $year->financial_year);
+            if ($month->financial_month && $year->financial_year) {
+                return redirect(CrudBooster::adminPath('monthly_amounts') . "?month=" . $month->financial_month . "&year=" . $year->financial_year);
+            }
+
         }
         return parent::getIndex();
     }
@@ -290,12 +295,12 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
         if (Request::get("engineer")) {
             $query->where("engineer.num", Request::get("engineer"));
         }
-        if ((!Request::get('year') || !Request::get('month') || !Request::get('engineer')) &&  CrudBooster::me()->id_cms_privileges == 1) {
+        if ((!Request::get('year') || !Request::get('month') || !Request::get('engineer')) && CrudBooster::me()->id_cms_privileges == 1) {
+            $query->where("financial_deals.id", "-1");
+        } else if ((!Request::get('year') || !Request::get('month')) && CrudBooster::me()->id_cms_privileges == 2) {
             $query->where("financial_deals.id", "-1");
         }
-        else if ((!Request::get('year') || !Request::get('month')) &&  CrudBooster::me()->id_cms_privileges == 2) {
-            $query->where("financial_deals.id", "-1");
-        }
+        $query->whereNull("financial_deals.deleted_at");
     }
 
     /*
@@ -459,7 +464,7 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
             "type" => "القبض الشهري",
             "date" => Carbon::now(),
             "file_name" => session("file_name"),
-            "total_studies_before" => FinancialDeal::get()->count(),
+            "total_studies_before" => FinancialDeal::whereNull("deleted_at")->get()->count(),
         ]);
         $engineers = DB::table('cms_users')->where("id_cms_privileges", 2)->pluck("id", "num")->toArray();
         foreach ($rows as $value) {
@@ -503,7 +508,7 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
                 $failedError[] = $value;
                 $e = (string) $e;
                 Cache::put('error_' . $file_md5, $e, 500);
-                Log::log('error',"Error importing monthly paid $e");
+                Log::log('error', "Error importing monthly paid $e");
             }
         }
         $operation->update([
@@ -586,7 +591,7 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
                 $pdf->setPrintFooter(true);
                 // dd((array) $response);
                 if (view()->exists(CrudBooster::getCurrentModule()->path . '.export')) {
-                    $html = view(CrudBooster::getCurrentModule()->path . '.export',(array)  $response)->render();
+                    $html = view(CrudBooster::getCurrentModule()->path . '.export', (array) $response)->render();
                 } else {
                     $html = view('crudbooster::export', $response)->render();
                 }

@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+use App\Http\Models\Deal;
 use App\Http\Models\ImportOperation;
 use App\Http\Models\PaidDeal;
 use Carbon\Carbon;
@@ -45,8 +46,8 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
 
         # START COLUMNS DO NOT REMOVE THIS LINE
         $this->col = [];
-        $this->col[] = array("label" => "رقم المهندس", "name" => "paid_deals.engineer_id", "join" => "cms_users,num");
-        $this->col[] = array("label" => "اسم المهندس", "name" => "cms_users.name");
+        $this->col[] = array("label" => "رقم المهندس", "name" => "paid_deals.engineer_id", "join" => "cms_users,num","visible"=>false);
+        $this->col[] = array("label" => "اسم المهندس", "name" => "cms_users.name","visible"=>false);
         $this->col[] = array("label" => "رقم المعاملة", "name" => "paid_deals.deal_id", "join" => "deals,file_num");
         $this->col[] = array("label" => "تاريخ المعاملة", "name" => "deals.file_date");
         $this->col[] = array("label" => "رقم المذكرة", "name" => "paid_deals.note_num");
@@ -55,6 +56,9 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
         $this->col[] = array("label" => "الشهر", "name" => "paid_deals.month", "visible" => false);
         $this->col[] = array("label" => "العام", "name" => "paid_deals.year", "visible" => false);
         $this->col[] = array("label" => "المبلغ الكلي", "name" => "paid_deals.total_amount");
+        $this->col[] = array("label" => "صاحب العلاقة", "name" => "deals.owner_name");
+        $this->col[] = array("label" => "المنطقة العقارية", "name" => "deals.real_estate_area");
+        $this->col[] = array("label" => "أرقام العقارات", "name" => "deals.real_estate_num");
 
         # END COLUMNS DO NOT REMOVE THIS LINE
         # START FORM DO NOT REMOVE THIS LINE
@@ -215,16 +219,21 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
     {
         if (!Request::get("month") && !Request::get("year")) {
             $month = Db::table('paid_deals')
+                ->whereNull("deleted_at")
                 ->distinct('month')
                 ->select('month')
                 ->orderby('month', "desc")
                 ->first();
             $year = Db::table('paid_deals')
+                ->whereNull("deleted_at")
                 ->distinct('year')
                 ->select('year')
                 ->orderby('year', "desc")
                 ->first();
-            return redirect(CrudBooster::adminPath('paid_deals') . "?month=" . $month->month . "&year=" . $year->year);
+            if ($month->month && $year->year) {
+                return redirect(CrudBooster::adminPath('paid_deals') . "?month=" . $month->month . "&year=" . $year->year);
+            }
+
         }
         return parent::getIndex();
     }
@@ -267,10 +276,9 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
         if (Request::get("engineer")) {
             $query->where("engineer.num", Request::get("engineer"));
         }
-        if ((!Request::get('year') || !Request::get('month') || !Request::get('engineer')) &&  CrudBooster::me()->id_cms_privileges == 1) {
+        if ((!Request::get('year') || !Request::get('month') || !Request::get('engineer')) && CrudBooster::me()->id_cms_privileges == 1) {
             $query->where("paid_deals.id", "-1");
-        }
-        else if ((!Request::get('year') || !Request::get('month')) &&  CrudBooster::me()->id_cms_privileges == 2) {
+        } else if ((!Request::get('year') || !Request::get('month')) && CrudBooster::me()->id_cms_privileges == 2) {
             $query->where("paid_deals.id", "-1");
         }
     }
@@ -366,7 +374,7 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
     }
 
     //By the way, you can still create your own method in here... :)
-	public function postDoUploadImportData()
+    public function postDoUploadImportData()
     {
         $this->cbLoader();
         if (Request::hasFile('userfile')) {
@@ -436,22 +444,38 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
             "type" => "إقامات مسددة",
             "date" => Carbon::now(),
             "file_name" => session("file_name"),
-            "total_studies_before" => PaidDeal::get()->count(),
+            "total_studies_before" => PaidDeal::whereNull("deleted_at")->get()->count(),
         ]);
         $engineers = DB::table('cms_users')->where("id_cms_privileges", 2)->pluck("id", "num")->toArray();
-        $deals = DB::table('deals')->pluck("id", "file_num")->toArray();
+        $dealsArr = DB::table('v_residents_deals')->get()->toArray();
         foreach ($rows as $value) {
-            if (!$value["rkm_almaaaml"] || !$value["rkm_almhnds"]) {
+            if (!$value["rkm_almaaaml"] || !$value["rkm_almhnds"] || !$value["rkm_almthkr"]) {
                 continue;
             }
             $total_file_records++;
-            if (!$engineers[$value["rkm_almhnds"]] || !$deals[$value["rkm_almaaaml"]]) {
+            if (!$engineers[$value["rkm_almhnds"]]) {
                 $failedError[] = $value->toArray();
                 $total_failed++;
                 continue;
             }
+            $deal = array_values(array_filter(
+                $dealsArr,
+                function ($item) use ($value) {
+                    return $item->file_num == intval($value["rkm_almaaaml"]) && $item->file_date == $value["tarykh_almaaaml"]->format("Y-m-d");
+                }))[0];
+            if (!$deal && is_numeric($value["rkm_almaaaml"])) {
+                $deal = Deal::create([
+                    "operation_id" => $operation->id,
+                    "file_num" => $value["rkm_almaaaml"],
+                    "file_date" => $value["tarykh_almaaaml"]->format("Y-m-d"),
+                    "owner_name" => $value["sahb_alaalak"],
+                    "real_estate_area" => $value["almntk_alaakary"],
+                    "real_estate_num" => $value["arkam_alaakarat"],
+                ]);
+                $dealsArr[] = (object) $deal->toArray();
+            }
             $engineer_id = $engineers[$value["rkm_almhnds"]];
-            $deal_id = $deals[$value["rkm_almaaaml"]];
+            $deal_id = $deal->id;
             $paidDealData = [
                 "operation_id" => $operation->id,
                 "deal_id" => $deal_id,
@@ -463,13 +487,21 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
                 "application_date" => $value["tarykh_alttbyk"],
                 "total_amount" => $value["almblgh"],
             ];
-
             try {
                 PaidDeal::create($paidDealData);
                 $total_successfully++;
                 Cache::increment('success_' . $file_md5);
+                if (!$deal->paid_month && $deal->residents_count > 0) {
+                    $paidDeals = PaidDeal::where("deal_id", $deal_id)->orderby("year", "desc")->orderby("month", "desc")->get();
+                    if ($paidDeals->count() == $deal->residents_count) {
+                        Deal::where("id", $deal_id)->update([
+                            "paid_month" => $paidDeals->last()->month,
+                            "paid_year" => $paidDeals->last()->year,
+                        ]);
+                    }
+                }
             } catch (\Exception $e) {
-                Log::log("error", "Error Importing PaidDeal " . $e->getMessage());
+                Log::log("error", "Error Importing PaidDeal " . $e);
                 $total_failed++;
                 $failedError[] = $value;
                 $e = (string) $e;

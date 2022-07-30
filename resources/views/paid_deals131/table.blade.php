@@ -51,136 +51,103 @@
     <div class="tableFixHead">
         <input type='hidden' name='button_name' value='' />
         <input type='hidden' name='_token' value='{{ csrf_token() }}' />
-        <table id='table_dashboard' class="table table-hover table-striped table-bordered">
-            <thead>
-                <tr class="active">
-                    <?php if ($button_bulk_action): ?>
-                    <th width='3%'><input type='checkbox' id='checkall' /></th>
-                    <?php endif;?>
-                    <?php if ($show_numbering): ?>
-                    <th width="1%">#</th>
-                    <?php endif;?>
-                    <?php
-                    foreach ($columns as $col) {
-                        if ($col['visible'] === false) {
-                            continue;
-                        }
-                    
-                        $sort_column = Request::get('filter_column');
-                        $colname = $col['label'];
-                        $name = $col['name'];
-                        $field = $col['field_with'];
-                        $width = $col['width'] ?: 'auto';
-                        $mainpath = trim(CRUDBooster::mainpath(), '/') . $build_query;
-                        echo "<th width='$width'>";
-                        if (isset($sort_column[$field])) {
-                            switch ($sort_column[$field]['sorting']) {
-                                case 'asc':
-                                    $url = CRUDBooster::urlFilterColumn($field, 'sorting', 'desc');
-                                    echo "<a href='$url' title='Click to sort descending'>$colname &nbsp; <i class='fa fa-sort-desc'></i></a>";
-                                    break;
-                                case 'desc':
-                                    $url = CRUDBooster::urlFilterColumn($field, 'sorting', 'asc');
-                                    echo "<a href='$url' title='Click to sort ascending'>$colname &nbsp; <i class='fa fa-sort-asc'></i></a>";
-                                    break;
-                                default:
-                                    $url = CRUDBooster::urlFilterColumn($field, 'sorting', 'asc');
-                                    echo "<a href='$url' title='Click to sort ascending'>$colname &nbsp; <i class='fa fa-sort'></i></a>";
-                                    break;
+        @if ((!Request::get('year') || !Request::get('month') || !Request::get('engineer')) &&  CrudBooster::me()->id_cms_privileges == 1)
+            <div class="bg-info text-center" style="padding: 10px;margin: 17px;">
+                الرجاء اختيار السنة و الشهر و المهندس
+            </div>
+        @elseif((!Request::get('year') || !Request::get('month')) && CrudBooster::me()->id_cms_privileges == 2)
+            <div class="bg-info text-center" style="padding: 10px;margin: 17px;">
+                الرجاء اختيار السنة و الشهر
+            </div>
+        @elseif (count($result) == 0)
+            <div class="bg-info text-center" style="padding: 10px;margin: 17px;">
+                {{ trans('crudbooster.table_data_not_found') }}
+            </div>
+        @else
+            <table id='table_dashboard' class="table table-hover table-striped table-bordered">
+                <thead>
+                    <tr class="active">
+                        <?php if ($button_bulk_action): ?>
+                        <th width='3%'><input type='checkbox' id='checkall' /></th>
+                        <?php endif;?>
+                        <?php if ($show_numbering): ?>
+                        <th width="1%">#</th>
+                        <?php endif;?>
+                        <?php
+                        foreach ($columns as $col) {
+                            if ($col['visible'] === false) {
+                                continue;
                             }
-                        } else {
-                            $url = CRUDBooster::urlFilterColumn($field, 'sorting', 'asc');
-                            echo "<a href='$url' title='Click to sort ascending'>$colname &nbsp; <i class='fa fa-sort'></i></a>";
+                        
+                            $sort_column = Request::get('filter_column');
+                            $colname = $col['label'];
+                            $name = $col['name'];
+                            $field = $col['field_with'];
+                            $width = $col['width'] ?: 'auto';
+                            $mainpath = trim(CRUDBooster::mainpath(), '/') . $build_query;
+                            echo "<th width='$width'>";
+                            if (isset($sort_column[$field])) {
+                                switch ($sort_column[$field]['sorting']) {
+                                    case 'asc':
+                                        $url = CRUDBooster::urlFilterColumn($field, 'sorting', 'desc');
+                                        echo "<a href='$url' title='Click to sort descending'>$colname &nbsp; <i class='fa fa-sort-desc'></i></a>";
+                                        break;
+                                    case 'desc':
+                                        $url = CRUDBooster::urlFilterColumn($field, 'sorting', 'asc');
+                                        echo "<a href='$url' title='Click to sort ascending'>$colname &nbsp; <i class='fa fa-sort-asc'></i></a>";
+                                        break;
+                                    default:
+                                        $url = CRUDBooster::urlFilterColumn($field, 'sorting', 'asc');
+                                        echo "<a href='$url' title='Click to sort ascending'>$colname &nbsp; <i class='fa fa-sort'></i></a>";
+                                        break;
+                                }
+                            } else {
+                                $url = CRUDBooster::urlFilterColumn($field, 'sorting', 'asc');
+                                echo "<a href='$url' title='Click to sort ascending'>$colname &nbsp; <i class='fa fa-sort'></i></a>";
+                            }
+                        
+                            echo '</th>';
                         }
-                    
-                        echo '</th>';
-                    }
-                    ?>
+                        ?>
 
-                    @if ($button_table_action)
-                        @if (CRUDBooster::isUpdate() || CRUDBooster::isDelete() || CRUDBooster::isRead())
-                            <th width='{{ $button_action_width ?: 'auto' }}' style="text-align:right">
-                                {{ trans('crudbooster.action_label') }}</th>
+                        @if ($button_table_action)
+                            <th width='10px' style="text-align:right">
+                            </th>
                         @endif
-                    @endif
-                </tr>
-            </thead>
-            <tbody>
-                @if (count($result) == 0)
-                    <tr class='warning'>
-                        <?php if ($button_bulk_action && $show_numbering): ?>
-                        <td colspan='{{ count($columns) + 3 }}' align="center">
-                            <?php elseif (($button_bulk_action && !$show_numbering) || (!$button_bulk_action && $show_numbering)): ?>
-                        <td colspan='{{ count($columns) + 2 }}' align="center">
-                            <?php else: ?>
-                        <td colspan='{{ count($columns) + 1 }}' align="center">
-                            <?php endif;?>
-
-                            <i class='fa fa-search'></i> {{ trans('crudbooster.table_data_not_found') }}
-                        </td>
                     </tr>
-                @endif
+                </thead>
+                <tbody>
+                    @foreach ($html_contents['html'] as $i => $hc)
+                        @if ($table_row_color)
+                            <?php $tr_color = null; ?>
+                            @foreach ($table_row_color as $trc)
+                                <?php
+                                $query = $trc['condition'];
+                                $color = $trc['color'];
+                                $row = $html_contents['data'][$i];
+                                foreach ($row as $key => $val) {
+                                    $query = str_replace('[' . $key . ']', '"' . $val . '"', $query);
+                                }
+                                
+                                @eval("if($query) {
+                                                                                                                                                                                                                                                                                                                                                                  \$tr_color = \$color;
+                                                                                                                                                                                                                                                                                                                                                              }");
+                                ?>
+                            @endforeach
+                            <?php echo "<tr class='$tr_color'>"; ?>
+                        @else
+                            <tr>
+                        @endif
 
-                @foreach ($html_contents['html'] as $i => $hc)
-                    @if ($table_row_color)
-                        <?php $tr_color = null; ?>
-                        @foreach ($table_row_color as $trc)
-                            <?php
-                            $query = $trc['condition'];
-                            $color = $trc['color'];
-                            $row = $html_contents['data'][$i];
-                            foreach ($row as $key => $val) {
-                                $query = str_replace('[' . $key . ']', '"' . $val . '"', $query);
-                            }
-                            
-                            @eval("if($query) {
-                                                                                                                  \$tr_color = \$color;
-                                                                                                              }");
-                            ?>
+                        @foreach ($hc as $h)
+                            <td>{!! $h !!}</td>
                         @endforeach
-                        <?php echo "<tr class='$tr_color'>"; ?>
-                    @else
-                        <tr>
-                    @endif
-
-                    @foreach ($hc as $h)
-                        <td>{!! $h !!}</td>
+                        </tr>
                     @endforeach
-                    </tr>
-                @endforeach
-            </tbody>
+                </tbody>
+            </table>
+        @endif
 
-
-            <tfoot>
-                <tr>
-                    <?php if ($button_bulk_action): ?>
-                    <th>&nbsp;</th>
-                    <?php endif;?>
-
-                    <?php if ($show_numbering): ?>
-                    <th>&nbsp;</th>
-                    <?php endif;?>
-
-                    <?php
-                    foreach ($columns as $col) {
-                        if ($col['visible'] === false) {
-                            continue;
-                        }
-                    
-                        $colname = $col['label'];
-                        $width = $col['width'] ?: 'auto';
-                        echo "<th width='$width'>$colname</th>";
-                    }
-                    ?>
-
-                    @if ($button_table_action)
-                        @if (CRUDBooster::isUpdate() || CRUDBooster::isDelete() || CRUDBooster::isRead())
-                            <th> -</th>
-                        @endif
-                    @endif
-                </tr>
-            </tfoot>
-        </table>
     </div>
 
 
@@ -201,46 +168,14 @@ $total = $result->total();
 @if ($columns)
     @push('bottom')
         <script>
-            //fesal
-            @if($button_table_sortable)
-            $('#table_dashboard tbody').sortable({
-                axis: 'y',
-                update: function(event, ui) {
-                    var data_list = new Array();
-                    $('#table_dashboard').find('input[type="checkbox"]').each(function(e) {
-                        data_list.push($(this).val());
-                    });
-
-                    var table = '{{ $table_name }}';
-                    $('html, body').css("cursor", "wait");
-
-                    // POST to server using $.post or $.ajax
-                    $.ajax({
-                        data: {
-                            data: data_list,
-                            table_name: table
-                        },
-                        type: 'POST',
-                        url: '/modules/sort',
-                        success: function(data) {
-                            $('html, body').css("cursor", "auto");
-                        },
-                        error: function(data) {
-                            $('html, body').css("cursor", "auto");
-                        }
-                    });
-                }
-            });
-            @endif
-
             $(function() {
                 $('.btn-filter-data').click(function() {
                     $('#filter-data').modal('show');
                 })
 
-                $('.btn-export-data').click(function() {
-                    $('#export-data').modal('show');
-                })
+                // $('.btn-export-data').click(function() {
+                //     $('#export-data').modal('show');
+                // })
 
                 var toggle_advanced_report_boolean = 1;
                 $(".toggle_advanced_report").click(function() {
@@ -545,9 +480,9 @@ $total = $result->total();
                     $('#filter-data').modal('show');
                 })
 
-                $('.btn-export-data').click(function() {
-                    $('#export-data').modal('show');
-                })
+                // $('.btn-export-data').click(function() {
+                //     $('#export-data').modal('show');
+                // })
 
                 var toggle_advanced_report_boolean = 1;
                 $(".toggle_advanced_report").click(function() {
@@ -581,7 +516,8 @@ $total = $result->total();
                             {{ trans('crudbooster.export_dialog_title') }}</h4>
                     </div>
 
-                    <form method='post' target="_blank" action='{{ CRUDBooster::mainpath('export-data?t=' . time()) }}'>
+                    <form method='post' id='export-data-post' target="_blank"
+                        action='{{ CRUDBooster::mainpath('export-data?t=' . time()) }}'>
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         {!! CRUDBooster::getUrlParameters() !!}
                         <div class="modal-body">
@@ -594,7 +530,7 @@ $total = $result->total();
                                 </div>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group hide">
                                 <label>{{ trans('crudbooster.export_dialog_maxdata') }}</label>
                                 <input type='number' name='limit' class='form-control' required value='100' max="100000"
                                     min="1" />
@@ -607,6 +543,8 @@ $total = $result->total();
                                     <div class='checkbox inline'><label><input type='checkbox' checked name='columns[]'
                                                 value='{{ $col['name'] }}'>{{ $col['label'] }}</label></div>
                                 @endforeach
+                                <div class='checkbox inline'><label><input type='checkbox' checked name='columns[]'
+                                            value='studies'>تفاصيل الدراسات</label></div>
                             </div>
 
                             <div class="form-group">
@@ -617,9 +555,11 @@ $total = $result->total();
                                 </select>
                             </div>
 
-                            <p><a href='javascript:void(0)' class='toggle_advanced_report'><i
+                            <p class="hide">
+                                <a href='javascript:void(0)' class='toggle_advanced_report'><i
                                         class='fa fa-plus-square-o'></i>
-                                    {{ trans('crudbooster.export_dialog_show_advanced') }}</a></p>
+                                    {{ trans('crudbooster.export_dialog_show_advanced') }}</a>
+                            </p>
 
                             <div id='advanced_export' style='display: none'>
 
@@ -627,25 +567,7 @@ $total = $result->total();
                                 <div class="form-group">
                                     <label>{{ trans('crudbooster.export_dialog_page_size') }}</label>
                                     <select class='form-control' name='page_size'>
-                                        <option <?= $setting->default_paper_size == 'Letter' ? 'selected' : '' ?>
-                                            value='Letter'>Letter</option>
-                                        <option <?= $setting->default_paper_size == 'Legal' ? 'selected' : '' ?>
-                                            value='Legal'>Legal</option>
-                                        <option <?= $setting->default_paper_size == 'Ledger' ? 'selected' : '' ?>
-                                            value='Ledger'>Ledger</option>
-                                        <?php for ($i = 0; $i <= 8; $i++):
-    $select = ($setting->default_paper_size == 'A' . $i) ? "selected" : "";
-    ?>
-                                        <option <?= $select ?> value='A{{ $i }}'>A{{ $i }}
-                                        </option>
-                                        <?php endfor;?>
-
-                                        <?php for ($i = 0; $i <= 10; $i++):
-    $select = ($setting->default_paper_size == 'B' . $i) ? "selected" : "";
-    ?>
-                                        <option <?= $select ?> value='B{{ $i }}'>B{{ $i }}
-                                        </option>
-                                        <?php endfor;?>
+                                        <option value="A4">A4</option>
                                     </select>
                                     <div class='help-block'><input type='checkbox' name='default_paper_size' value='1' />
                                         {{ trans('crudbooster.export_dialog_set_default') }}</div>
@@ -655,7 +577,7 @@ $total = $result->total();
                                     <label>{{ trans('crudbooster.export_dialog_page_orientation') }}</label>
                                     <select class='form-control' name='page_orientation'>
                                         <option value='potrait'>Potrait</option>
-                                        <option value='landscape'>Landscape</option>
+                                        <option selected value='landscape'>Landscape</option>
                                     </select>
                                 </div>
                             </div>
@@ -664,13 +586,24 @@ $total = $result->total();
                         <div class="modal-footer" align="right">
                             <button class="btn btn-default" type="button"
                                 data-dismiss="modal">{{ trans('crudbooster.button_close') }}</button>
-                            <button class="btn btn-primary btn-submit"
-                                type="submit">{{ trans('crudbooster.button_submit') }}</button>
+                            <button class="btn btn-primary btn-submit" type="submit">تصدير</button>
                         </div>
                     </form>
                 </div>
                 <!-- /.modal-content -->
             </div>
         </div>
+
+        <script>
+            $(function() {
+                $("#btn_export_data").click(function() {
+                    $("#export-data-post").submit();
+                });
+
+                $("#month,#year").change(function() {
+                    $("#table_filter_form").submit();
+                })
+            })
+        </script>
     @endpush
 @endif

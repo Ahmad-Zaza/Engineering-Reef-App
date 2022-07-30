@@ -66,37 +66,37 @@
             <tr nobr="true">
                 <td></td>
                 <td style="border: 0.7px solid #494444;font-family:arialbd;background-color: #9b9999;">الحصة</td>
-                <td style="border: 0.7px solid #494444;background-color: #9b9999;">{{ $effort_percent }}</td>
+                <td style="border: 0.7px solid #494444;background-color: #9b9999;">{{ round($effort_percent,2) }}</td>
                 <td></td>
             </tr>
             <tr nobr="true">
                 <td></td>
                 <td style="border: 0.7px solid #494444;font-family:arialbd;">مورد المشترك</td>
-                <td style="border: 0.7px solid #494444;">{{ $share_in }}</td>
+                <td style="border: 0.7px solid #494444;">{{ round($share_in,2) }}</td>
                 <td></td>
             </tr>
             <tr nobr="true">
                 <td></td>
                 <td style="border: 0.7px solid #494444;font-family:arialbd;background-color: #9b9999;">مقبوض المشترك</td>
-                <td style="border: 0.7px solid #494444;background-color: #9b9999;">{{ $share_out }}</td>
+                <td style="border: 0.7px solid #494444;background-color: #9b9999;">{{ round($share_out,2) }}</td>
                 <td></td>
             </tr>
             <tr nobr="true">
                 <td></td>
                 <td style="border: 0.7px solid #494444;font-family:arialbd;">مقبوض التدقيق</td>
-                <td style="border: 0.7px solid #494444;">{{ $veri_out }}</td>
+                <td style="border: 0.7px solid #494444;">{{ round($veri_out,2) }}</td>
                 <td></td>
             </tr>
             <tr nobr="true">
                 <td></td>
                 <td style="border: 0.7px solid #494444;font-family:arialbd;background-color: #9b9999;">رديات مقيم</td>
-                <td style="border: 0.7px solid #494444;background-color: #9b9999;">{{ $resident_out }}</td>
+                <td style="border: 0.7px solid #494444;background-color: #9b9999;">{{ round($resident_out,2) }}</td>
                 <td></td>
             </tr>
             <tr nobr="true">
                 <td></td>
                 <td style="border: 0.7px solid #494444;font-family:arialbd;">رديات إضبارة</td>
-                <td style="border: 0.7px solid #494444;">{{ $folder_out }}</td>
+                <td style="border: 0.7px solid #494444;">{{ round($folder_out,2) }}</td>
                 <td></td>
             </tr>
             <tr nobr="true">

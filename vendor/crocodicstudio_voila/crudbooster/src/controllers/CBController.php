@@ -71,6 +71,8 @@ class CBController extends Controller
 
     public $button_table_action = true;
 
+    public $button_table_sortable = false;
+
     public $button_bulk_action = true;
 
     public $button_add = true;
@@ -158,6 +160,7 @@ class CBController extends Controller
         $this->data['button_save'] = $this->button_save;
         $this->data['button_table_action'] = $this->button_table_action;
         $this->data['button_bulk_action'] = $this->button_bulk_action;
+        $this->data['button_table_sortable'] = $this->button_table_sortable;
         $this->data['button_import'] = $this->button_import;
         $this->data['button_action_width'] = $this->button_action_width;
         $this->data['button_selected'] = $this->button_selected;

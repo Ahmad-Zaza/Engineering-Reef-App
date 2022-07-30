@@ -1,18 +1,30 @@
 <?php namespace App\Http\Controllers;
 
+use App\Http\Models\Deal;
+use App\Http\Models\ImportOperation;
+use App\Http\Models\PaidDeal;
+use Carbon\Carbon;
+use crocodicstudio_voila\crudbooster\helpers\CB;
 use crocodicstudio_voila\crudbooster\helpers\CRUDBooster;
+use Exception;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use TCPDF_FONTS;
 
-class AdminDealDetails133Controller extends \crocodicstudio_voila\crudbooster\controllers\CBController
+class AdminPaidDeals131Controller extends \crocodicstudio_voila\crudbooster\controllers\CBController
 {
 
     public function cbInit()
     {
         # START CONFIGURATION DO NOT REMOVE THIS LINE
-        $this->table = "deal_details";
+        $this->table = "deals";
         $this->title_field = "id";
         $this->limit = 20;
         $this->orderby = "id,desc";
@@ -34,16 +46,11 @@ class AdminDealDetails133Controller extends \crocodicstudio_voila\crudbooster\co
 
         # START COLUMNS DO NOT REMOVE THIS LINE
         $this->col = [];
-        $this->col[] = array("label" => "رقم المهندس", "name" => "deal_details.study_engineer_id", "join" => "cms_users,num");
-        $this->col[] = array("label" => "اسم المهندس", "name" => "cms_users.name");
-        $this->col[] = array("label" => "رقم المعاملة", "name" => "deal_details.deal_id", "join" => "deals,file_num");
+        $this->col[] = array("label" => "رقم المعاملة", "name" => "deals.file_num");
         $this->col[] = array("label" => "تاريخ المعاملة", "name" => "deals.file_date");
-        $this->col[] = array("label" => "الشهر", "name" => "deals.close_month", "visible" => false);
-        $this->col[] = array("label" => "العام", "name" => "deals.close_year", "visible" => false);
-        $this->col[] = array("label" => "المبلغ الكلي", "name" => "deal_details.study_resident_value");
         $this->col[] = array("label" => "صاحب العلاقة", "name" => "deals.owner_name");
         $this->col[] = array("label" => "المنطقة العقارية", "name" => "deals.real_estate_area");
-        $this->col[] = array("label" => "ارقام العقار", "name" => "deals.real_estate_num");
+        $this->col[] = array("label" => "أرقام العقارات", "name" => "deals.real_estate_num");
 
         # END COLUMNS DO NOT REMOVE THIS LINE
         # START FORM DO NOT REMOVE THIS LINE
@@ -77,6 +84,7 @@ class AdminDealDetails133Controller extends \crocodicstudio_voila\crudbooster\co
         |
          */
         $this->addaction = array();
+        $this->addaction[] = ['label' => 'طباعة PDF', 'title' => 'طباعة PDF', 'url' => CRUDBooster::adminPath('deal_details/export-pdf/[id]'), 'icon' => 'fa fa-pdf', 'color' => 'success', 'target' => "_blank"];
 
         /*
         | ----------------------------------------------------------------------
@@ -203,22 +211,21 @@ class AdminDealDetails133Controller extends \crocodicstudio_voila\crudbooster\co
     public function getIndex()
     {
         if (!Request::get("month") && !Request::get("year")) {
-            $month = Db::table('deals')->where("deleted_at",null)
-                ->distinct('close_month')
-                ->whereNotNull('close_month')
-                ->select('close_month')
-                ->orderby('close_month', "desc")
+            $month = Db::table('paid_deals')
+                ->whereNull("deleted_at")
+                ->distinct('month')
+                ->select('month')
+                ->orderby('month', "desc")
                 ->first();
-            $year = Db::table('deals')->where("deleted_at",null)
-                ->distinct('close_year')
-                ->whereNotNull('close_year')
-                ->select('close_year')
-                ->orderby('close_year', "desc")
+            $year = Db::table('paid_deals')
+                ->whereNull("deleted_at")
+                ->distinct('year')
+                ->select('year')
+                ->orderby('year', "desc")
                 ->first();
-            if ($month->close_month && $year->close_year) {
-                return redirect(CrudBooster::adminPath('deal_details133') . "?month=" . $month->close_month . "&year=" . $year->close_year);
+            if ($month->month && $year->year) {
+                return redirect(CrudBooster::adminPath('paid_deals131') . "?month=" . $month->month . "&year=" . $year->year);
             }
-
         }
         return parent::getIndex();
     }
@@ -247,31 +254,31 @@ class AdminDealDetails133Controller extends \crocodicstudio_voila\crudbooster\co
     public function hook_query_index(&$query)
     {
         //Your code here
-        $query->leftjoin("deals as deals1", "deal_details.deal_id", "=", "deals1.id");
-        $query->leftjoin("cms_users as engineer", "deal_details.study_engineer_id", "=", "engineer.id");
-        $query->leftjoin("cms_users as deal_engineer", "deals1.file_engineer_id", "=", "deal_engineer.id");
-        $query->select(["deal_engineer.num as deal_engineer_num", "deal_engineer.name as deal_engineer_name"]);
+        $query->leftjoin("cms_users as deal_engineer", "deals.file_engineer_id", "=", "deal_engineer.id");
+
         if (CrudBooster::me()->id_cms_privileges == 2) {
-            $query->where("deals1.file_engineer_id", CrudBooster::me()->id);
-        }
-        //Your code here
-        if (Request::get("month")) {
-            $query->where("deals1.close_month", "<=", Request::get("month"));
-        }
-        if (Request::get("year")) {
-            $query->where("deals1.close_year", "<=", Request::get("year"));
+            $query->where("deals.file_engineer_id", CrudBooster::me()->id);
         }
         if (Request::get("engineer")) {
             $query->where("deal_engineer.num", Request::get("engineer"));
         }
+        $query->whereNotNull("deals.file_num");
         if ((!Request::get('year') || !Request::get('month') || !Request::get('engineer')) && CrudBooster::me()->id_cms_privileges == 1) {
-            $query->where("deal_details.id", "-1");
+            $query->where("deals.id", "-1");
         } else if ((!Request::get('year') || !Request::get('month')) && CrudBooster::me()->id_cms_privileges == 2) {
-            $query->where("deal_details.id", "-1");
+            $query->where("paid_deals.id", "-1");
         }
-        $query->where("deal_details.study_resident_value", ">", 0);
-        $query->orderBy("deals.file_num", "desc");
-        $query->orderBy("deals.file_date", "desc");
+        //-------------------------//
+        if (Request::get('year')) {
+            $query->whereRaw("(deals.paid_year > ".Request::get('year')." or deals.paid_year is null)");
+            // $query->where("deals.paid_year", "<=", Request::get('year'));
+        }
+        if (Request::get('month')) {
+            $query->whereRaw("(deals.paid_month > ".Request::get('month')." or deals.paid_month is null)");
+            // $query->where("deals.paid_month", "<=", Request::get('month'));
+        }
+        // dd($query->toSql());
+        //-------------------------//
     }
 
     /*
@@ -377,8 +384,6 @@ class AdminDealDetails133Controller extends \crocodicstudio_voila\crudbooster\co
         $paperorientation = Request::input('page_orientation');
         Request::merge(['limit' => 1000]);
         $response = $this->getIndex();
-        $response["month"] = Request::get("month");
-        $response["year"] = Request::get("year");
         // dd($response);
         if (Request::input('default_paper_size')) {
             DB::table('cms_settings')->where('name', 'default_paper_size')->update(['content' => $papersize]);

@@ -132,6 +132,7 @@
                             @php
                                 $months = Db::table('deals')
                                     ->distinct('close_month')
+                                    ->whereNotNull('close_month')
                                     ->select('close_month')
                                     ->orderby('close_month')
                                     ->get()
@@ -169,6 +170,7 @@
                             @php
                                 $years = Db::table('deals')
                                     ->distinct('close_year')
+                                    ->whereNotNull('close_year')
                                     ->select('close_year')
                                     ->orderby('close_year')
                                     ->get()

@@ -1,55 +1,50 @@
-<?php namespace App\Http\Controllers;
+<?php
+namespace App\Http\Controllers;
 
-use crocodicstudio_voila\crudbooster\helpers\CRUDBooster;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request;
-use Maatwebsite\Excel\Facades\Excel;
-use TCPDF_FONTS;
+use CRUDBooster;
 
-class AdminDealDetails133Controller extends \crocodicstudio_voila\crudbooster\controllers\CBController
+class AdminStudyTypesController extends \crocodicstudio_voila\crudbooster\controllers\CBController
 {
 
     public function cbInit()
     {
+
         # START CONFIGURATION DO NOT REMOVE THIS LINE
-        $this->table = "deal_details";
-        $this->title_field = "id";
-        $this->limit = 20;
-        $this->orderby = "id,desc";
-        $this->show_numbering = false;
+        $this->title_field = "name";
+        $this->limit = "20";
+        $this->orderby = "sorting,asc";
         $this->global_privilege = false;
-        $this->button_table_action = true;
+        $this->button_table_action = false;
+        $this->button_bulk_action = true;
         $this->button_action_style = "button_icon";
         $this->button_add = false;
-        $this->button_delete = false;
         $this->button_edit = false;
+        $this->button_delete = false;
         $this->button_detail = false;
         $this->button_show = false;
-        $this->button_filter = true;
-        $this->button_export = true;
+        $this->button_filter = false;
         $this->button_import = false;
-        $this->button_bulk_action = true;
-        $this->sidebar_mode = "normal"; //normal,mini,collapse,collapse-mini
+        $this->button_export = false;
+        $this->button_table_sortable = true;
+        $this->table = "study_types";
         # END CONFIGURATION DO NOT REMOVE THIS LINE
 
         # START COLUMNS DO NOT REMOVE THIS LINE
         $this->col = [];
-        $this->col[] = array("label" => "رقم المهندس", "name" => "deal_details.study_engineer_id", "join" => "cms_users,num");
-        $this->col[] = array("label" => "اسم المهندس", "name" => "cms_users.name");
-        $this->col[] = array("label" => "رقم المعاملة", "name" => "deal_details.deal_id", "join" => "deals,file_num");
-        $this->col[] = array("label" => "تاريخ المعاملة", "name" => "deals.file_date");
-        $this->col[] = array("label" => "الشهر", "name" => "deals.close_month", "visible" => false);
-        $this->col[] = array("label" => "العام", "name" => "deals.close_year", "visible" => false);
-        $this->col[] = array("label" => "المبلغ الكلي", "name" => "deal_details.study_resident_value");
-        $this->col[] = array("label" => "صاحب العلاقة", "name" => "deals.owner_name");
-        $this->col[] = array("label" => "المنطقة العقارية", "name" => "deals.real_estate_area");
-        $this->col[] = array("label" => "ارقام العقار", "name" => "deals.real_estate_num");
-
+        $this->col[] = ["label" => "نوع الدراسة", "name" => "name"];
         # END COLUMNS DO NOT REMOVE THIS LINE
+
         # START FORM DO NOT REMOVE THIS LINE
         $this->form = [];
-
+        $this->form[] = ['label' => 'نوع الدراسة', 'name' => 'name', 'type' => 'text', 'validation' => 'required|string|min:3|max:70', 'width' => 'col-sm-10', 'placeholder' => 'فضلاً أدخل أحرف فقط'];
         # END FORM DO NOT REMOVE THIS LINE
+
+        # OLD START FORM
+        //$this->form = [];
+        //$this->form[] = ["label"=>"Name","name"=>"name","type"=>"text","required"=>TRUE,"validation"=>"required|string|min:3|max:70","placeholder"=>"فضلاً أدخل أحرف فقط"];
+        //$this->form[] = ["label"=>"Active","name"=>"active","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+        //$this->form[] = ["label"=>"Sort","name"=>"sort","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+        # OLD END FORM
 
         /*
         | ----------------------------------------------------------------------
@@ -129,6 +124,9 @@ class AdminDealDetails133Controller extends \crocodicstudio_voila\crudbooster\co
         |
          */
 
+        $this->table_row_color[] = ["condition" => "[active]==1", "color" => "success"];
+        $this->table_row_color[] = ["condition" => "[active]==0", "color" => "danger"];
+
         /*
         | ----------------------------------------------------------------------
         | You may use this bellow array to add statistic at dashboard
@@ -200,29 +198,6 @@ class AdminDealDetails133Controller extends \crocodicstudio_voila\crudbooster\co
 
     }
 
-    public function getIndex()
-    {
-        if (!Request::get("month") && !Request::get("year")) {
-            $month = Db::table('deals')->where("deleted_at",null)
-                ->distinct('close_month')
-                ->whereNotNull('close_month')
-                ->select('close_month')
-                ->orderby('close_month', "desc")
-                ->first();
-            $year = Db::table('deals')->where("deleted_at",null)
-                ->distinct('close_year')
-                ->whereNotNull('close_year')
-                ->select('close_year')
-                ->orderby('close_year', "desc")
-                ->first();
-            if ($month->close_month && $year->close_year) {
-                return redirect(CrudBooster::adminPath('deal_details133') . "?month=" . $month->close_month . "&year=" . $year->close_year);
-            }
-
-        }
-        return parent::getIndex();
-    }
-
     /*
     | ----------------------------------------------------------------------
     | Hook for button selected
@@ -247,31 +222,7 @@ class AdminDealDetails133Controller extends \crocodicstudio_voila\crudbooster\co
     public function hook_query_index(&$query)
     {
         //Your code here
-        $query->leftjoin("deals as deals1", "deal_details.deal_id", "=", "deals1.id");
-        $query->leftjoin("cms_users as engineer", "deal_details.study_engineer_id", "=", "engineer.id");
-        $query->leftjoin("cms_users as deal_engineer", "deals1.file_engineer_id", "=", "deal_engineer.id");
-        $query->select(["deal_engineer.num as deal_engineer_num", "deal_engineer.name as deal_engineer_name"]);
-        if (CrudBooster::me()->id_cms_privileges == 2) {
-            $query->where("deals1.file_engineer_id", CrudBooster::me()->id);
-        }
-        //Your code here
-        if (Request::get("month")) {
-            $query->where("deals1.close_month", "<=", Request::get("month"));
-        }
-        if (Request::get("year")) {
-            $query->where("deals1.close_year", "<=", Request::get("year"));
-        }
-        if (Request::get("engineer")) {
-            $query->where("deal_engineer.num", Request::get("engineer"));
-        }
-        if ((!Request::get('year') || !Request::get('month') || !Request::get('engineer')) && CrudBooster::me()->id_cms_privileges == 1) {
-            $query->where("deal_details.id", "-1");
-        } else if ((!Request::get('year') || !Request::get('month')) && CrudBooster::me()->id_cms_privileges == 2) {
-            $query->where("deal_details.id", "-1");
-        }
-        $query->where("deal_details.study_resident_value", ">", 0);
-        $query->orderBy("deals.file_num", "desc");
-        $query->orderBy("deals.file_date", "desc");
+
     }
 
     /*
@@ -365,88 +316,5 @@ class AdminDealDetails133Controller extends \crocodicstudio_voila\crudbooster\co
     }
 
     //By the way, you can still create your own method in here... :)
-
-    public function postExportData()
-    {
-        ini_set('memory_limit', '-1');
-        set_time_limit(0);
-        $this->index_return = true;
-        $filetype = Request::input('fileformat');
-        $filename = Request::input('filename');
-        $papersize = Request::input('page_size');
-        $paperorientation = Request::input('page_orientation');
-        Request::merge(['limit' => 1000]);
-        $response = $this->getIndex();
-        $response["month"] = Request::get("month");
-        $response["year"] = Request::get("year");
-        // dd($response);
-        if (Request::input('default_paper_size')) {
-            DB::table('cms_settings')->where('name', 'default_paper_size')->update(['content' => $papersize]);
-        }
-
-        switch ($filetype) {
-            case "pdf":
-                $pdf = new MYPDF("L", PDF_UNIT, "A4", true, 'UTF-8', false);
-                $lg = array();
-                $lg['a_meta_charset'] = 'UTF-8';
-                $lg['a_meta_dir'] = 'rtl';
-                $lg['a_meta_language'] = 'ar';
-                $lg['w_page'] = 'page';
-
-                // set some language-dependent strings (optional)
-                $pdf->setLanguageArray($lg);
-
-                //After Write
-                $pdf->setRTL(true);
-                //set margins
-                $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-                $pdf->SetPrintHeader(true);
-                $pdf->SetMargins(10, 18, 10);
-
-                // convert TTF font to TCPDF format and store it on the fonts folder
-                $fontFile = $_SERVER["DOCUMENT_ROOT"] . "/fonts/arial.ttf";
-                $fontname = TCPDF_FONTS::addTTFfont($fontFile, 'TrueTypeUnicode', '');
-                // use the font
-                $pdf->SetFont($fontname, '', 10, '', false);
-
-                $pdf->AddPage();
-                $pdf->setPrintFooter(true);
-                if (view()->exists(CrudBooster::getCurrentModule()->path . '.export')) {
-                    $html = view(CrudBooster::getCurrentModule()->path . '.export', $response)->render();
-                } else {
-                    $html = view('crudbooster::export', $response)->render();
-                }
-                // return $html;
-                $pdf->writeHTML($html, true, false, true, false, '');
-                return $pdf->Output('example_006.pdf', 'I');
-                break;
-            case 'xls':
-                Excel::create($filename, function ($excel) use ($response, $filename, $paperorientation) {
-                    $excel->setTitle($filename)->setCreator("crudbooster.com")->setCompany(CRUDBooster::getSetting('appname'));
-                    $excel->sheet($filename, function ($sheet) use ($response, $paperorientation) {
-                        $sheet->setOrientation($paperorientation);
-                        if (view()->exists(CrudBooster::getCurrentModule()->path . '.export')) {
-                            $sheet->loadview(CrudBooster::getCurrentModule()->path . '.export', $response);
-                        } else {
-                            $sheet->loadview('crudbooster::export', $response);
-                        }
-                    });
-                })->export('xls');
-                break;
-            case 'csv':
-                Excel::create($filename, function ($excel) use ($response, $filename, $paperorientation) {
-                    $excel->setTitle($filename)->setCreator("crudbooster.com")->setCompany(CRUDBooster::getSetting('appname'));
-                    $excel->sheet($filename, function ($sheet) use ($response, $paperorientation) {
-                        $sheet->setOrientation($paperorientation);
-                        if (view()->exists(CrudBooster::getCurrentModule()->path . '.export')) {
-                            $sheet->loadview(CrudBooster::getCurrentModule()->path . '.export', $response);
-                        } else {
-                            $sheet->loadview('crudbooster::export', $response);
-                        }
-                    });
-                })->export('csv');
-                break;
-        }
-    }
 
 }
