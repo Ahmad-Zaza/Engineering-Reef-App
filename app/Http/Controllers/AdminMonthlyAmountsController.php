@@ -440,14 +440,12 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
 
         if (Request::get('file') && Request::get('resume') == 1) {
             $total = Session::get('total_data_import');
-            $prog = 0;
-            if ($total > 0) {
-                $prog = intval(Cache::get('success_' . $file_md5)) / $total * 100;
-            }
-            $prog = round($prog);
+            $prog = intval(Cache::get('success_' . $file_md5)) / $total * 100;
+            $prog = round($prog, 2);
             if ($prog >= 100) {
                 Cache::forget('success_' . $file_md5);
             }
+
             return response()->json(['progress' => $prog, 'last_error' => Cache::get('error_' . $file_md5)]);
         }
 

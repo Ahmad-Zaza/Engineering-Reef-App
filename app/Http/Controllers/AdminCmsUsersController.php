@@ -1,12 +1,12 @@
 <?php namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use crocodicstudio_voila\crudbooster\helpers\CB;
 use crocodicstudio_voila\crudbooster\helpers\CRUDBooster;
 // use DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -44,26 +44,26 @@ class AdminCmsUsersController extends \crocodicstudio_voila\crudbooster\controll
         $this->form = array();
         if (CRUDBooster::me()->id_cms_privileges == 1) {
             $this->form[] = array("label" => "اسم المستخدم", "name" => "username", 'required' => true, 'validation' => 'required|unique:cms_users,username,' . CRUDBooster::getCurrentId());
-            $this->form[] = array("label" => "رقم المهندس", "name" => "num","type"=>"number",'validation' => 'required|unique:cms_users,num,' . CRUDBooster::getCurrentId());
-            $this->form[] = array("label" => "الكوتا", "name" => "cota","type"=>"number",'validation' => 'unique:cms_users,cota,' . CRUDBooster::getCurrentId());
+            $this->form[] = array("label" => "رقم المهندس", "name" => "num", "type" => "number", 'validation' => 'required|unique:cms_users,num,' . CRUDBooster::getCurrentId());
+            $this->form[] = array("label" => "الكوتا", "name" => "cota", "type" => "number", 'validation' => 'unique:cms_users,cota,' . CRUDBooster::getCurrentId());
             $this->form[] = array("label" => "اسم المهندس", "name" => "name", 'required' => true, 'validation' => 'required|alpha_spaces|min:3');
             $this->form[] = array("label" => "حالة المكتب", "name" => "office_status", 'type' => 'text');
         } else {
             $this->form[] = array("label" => "اسم المستخدم", "name" => "username", 'readonly' => true);
-            $this->form[] = array("label" => "رقم المهندس", "name" => "num",'readonly' => true);
-            $this->form[] = array("label" => "الكوتا", "name" => "cota",'readonly' => true);
+            $this->form[] = array("label" => "رقم المهندس", "name" => "num", 'readonly' => true);
+            $this->form[] = array("label" => "الكوتا", "name" => "cota", 'readonly' => true);
             $this->form[] = array("label" => "اسم المهندس", "name" => "name", 'readonly' => true);
-            $this->form[] = array("label" => "حالة المكتب", "name" => "office_status",'readonly' => true, 'type' => 'text');
-        
+            $this->form[] = array("label" => "حالة المكتب", "name" => "office_status", 'readonly' => true, 'type' => 'text');
+
         }
-        
+
         $this->form[] = array("label" => "البريد الإلكتروني", "name" => "email", 'type' => 'email', 'validation' => 'email|unique:cms_users,email,' . CRUDBooster::getCurrentId());
-            
+
         if (CRUDBooster::getCurrentMethod() == 'getEdit') {
-            $this->form[] = array("label" => "كلمة المرور", "name" => "password","validation"=>"string|confirmed", "type" => "password", "help" => "من فضلك اتركه فارغ إن لم ترد تغيير كلمة المرور");
+            $this->form[] = array("label" => "كلمة المرور", "name" => "password", "validation" => "string|confirmed", "type" => "password", "help" => "من فضلك اتركه فارغ إن لم ترد تغيير كلمة المرور");
             $this->form[] = array("label" => "تأكيد كلمة المرور", "name" => "password_confirmation", "type" => "password", "help" => "من فضلك اتركه فارغ إن لم ترد تغيير كلمة المرور");
         } else {
-            $this->form[] = array("label" => "كلمة المرور", "name" => "password","validation"=>"string|confirmed", "type" => "password", "help" => "من فضلك أدخل كلمة المرور");
+            $this->form[] = array("label" => "كلمة المرور", "name" => "password", "validation" => "string|confirmed", "type" => "password", "help" => "من فضلك أدخل كلمة المرور");
             $this->form[] = array("label" => "تأكيد كلمة المرور", "name" => "password_confirmation", "type" => "password", "help" => "من فضلك أدخل كلمة المرور مرة أخرى");
         }
 
@@ -117,14 +117,13 @@ class AdminCmsUsersController extends \crocodicstudio_voila\crudbooster\controll
 
     public function hook_query_index(&$query)
     {
-        $query->where("id_cms_privileges",2);
+        $query->where("id_cms_privileges", 2);
     }
 
     public function hook_before_delete($id)
     {
     }
-    
-    
+
     public function postDoUploadImportData()
     {
         $this->cbLoader();
@@ -206,37 +205,28 @@ class AdminCmsUsersController extends \crocodicstudio_voila\crudbooster\controll
                     $a[$colname] = password_hash($value->$s, PASSWORD_DEFAULT);
                 }
             }
-            if(!$a["username"]){
+            if (!$a["username"]) {
                 $a["username"] = $a["num"];
             }
-            if(!$a["password"]){
+            $user = DB::table($this->table)->where("num", $a["num"])->get();
+            if (!$a["password"] && !$user) {
                 $a["password"] = $password;
             }
             //----------------------------------//
-            $user = DB::table($this->table)->where("num", $a["num"])->get();
-            if ($user->count() > 0) {
-                continue;
-            }
-            //----------------------------------//
-            $has_title_field = true;
-            foreach ($a as $k => $v) {
-                if ($k == $this->title_field && $v == '') {
-                    $has_title_field = false;
-                    break;
-                }
-            }
-
-            if ($has_title_field == false) {
-                continue;
-            }
-
             try {
 
                 if ($has_created_at) {
                     $a['created_at'] = date('Y-m-d H:i:s');
                 }
-
-                DB::table($this->table)->insert($a);
+                if ($user->count() > 0) {
+                    DB::table($this->table)->where("id", $user->id)->update([
+                        "office_status" => $a["office_status"],
+                        "cota" => $a["cota"],
+                        "updated_at" => Carbon::now(),
+                    ]);
+                } else {
+                    DB::table($this->table)->insert($a);
+                }
                 Cache::increment('success_' . $file_md5);
             } catch (\Exception $e) {
                 $e = (string) $e;

@@ -37,6 +37,9 @@
         لايوجد بيانات متوفرة
     </h3>
 @else
+@php
+    // dd($result[0]);
+@endphp
 
     <body>
         <table cellpadding="2" cellspacing="4" border="0" style="border-collapse: collapse;background-color: #9b9999;"
@@ -46,10 +49,10 @@
                     <td width="16%" style="font-family:arialbd;">
                         تفاصيل الدراسات للمهندس:</td>
                     <td width="8%" style="border: 0.7px solid #494444;font-family:arialbd;background-color:white;">
-                        &nbsp;{{ $result[0]->deal_details[0]->num }}&nbsp;
+                        &nbsp;{{ $result[0]->deal_details[0]->study_user_num }}&nbsp;
                     </td>
                     <td width="25.5%" style="border: 0.7px solid #494444;font-family:arialbd;background-color:white;">
-                        {{ $result[0]->deal_details[0]->name }}
+                        {{ $result[0]->deal_details[0]->study_user_name }}
                     </td>
                     <td width="24%"></td>
                     <td width="4%" style="font-family:arialbd;">الكوتا:</td>

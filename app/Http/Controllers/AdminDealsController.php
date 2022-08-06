@@ -255,13 +255,13 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
     public function getIndex()
     {
         if (!Request::get("month") && !Request::get("year")) {
-            $month = Db::table('deals')->where("deleted_at",null)
+            $month = Db::table('deals')->where("deleted_at", null)
                 ->distinct('close_month')
                 ->whereNotNull('close_month')
                 ->select('close_month')
                 ->orderby('close_month', "desc")
                 ->first();
-            $year = Db::table('deals')->where("deleted_at",null)
+            $year = Db::table('deals')->where("deleted_at", null)
                 ->distinct('close_year')
                 ->whereNotNull('close_year')
                 ->select('close_year')
@@ -461,14 +461,12 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
 
         if (Request::get('file') && Request::get('resume') == 1) {
             $total = Session::get('total_data_import');
-            $prog = 0;
-            if ($total > 0) {
-                $prog = intval(Cache::get('success_' . $file_md5)) / $total * 100;
-            }
-            $prog = round($prog);
+            $prog = intval(Cache::get('success_' . $file_md5)) / $total * 100;
+            $prog = round($prog, 2);
             if ($prog >= 100) {
                 Cache::forget('success_' . $file_md5);
             }
+
             return response()->json(['progress' => $prog, 'last_error' => Cache::get('error_' . $file_md5)]);
         }
 
@@ -488,7 +486,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
             "total_studies_before" => DB::table('deal_details')->get()->count(),
         ]);
         $engineers = DB::table('cms_users')->where("id_cms_privileges", 2)->pluck("id", "num")->toArray();
-        $dealsArr = DB::table('deals')->where("deleted_at",null)->toArray();
+        $dealsArr = DB::table('deals')->where("deleted_at", null)->get()->toArray();
         foreach ($rows as $value) {
             if (!$value["rkm_almaaaml"]) {
                 $failedError[] = $value;
@@ -544,10 +542,11 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
                 $deal = array_values(array_filter(
                     $dealsArr,
                     function ($item) use ($value) {
-                        return $item->file_num == intval($value["rkm_almaaaml"]) && $item->file_date == $value["tarykh_almaaaml"]->format("Y-m-d");
+                        return $item->file_num == intval($value["rkm_almaaaml"]) && $item->file_date->format("Y-m-d") == $value["tarykh_almaaaml"]->format("Y-m-d");
                     }))[0];
                 if (!$deal) {
                     $deal = Deal::create($dealData);
+                    $dealsArr[] = (object) $deal->toArray();
                     $deals[$value["rkm_almaaaml"]] = $deal->id;
                     DealDetail::where("deal_id", $deal->id)->delete();
                 } else {
@@ -727,6 +726,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
                 ->leftjoin("cms_users as study_user", "deal_details.study_engineer_id", "=", "study_user.id")
                 ->leftjoin("study_types", "deal_details.study_name", "=", "study_types.name")
                 ->orderby("study_types.sorting", "asc")
+                ->select(["study_user.num as study_user_num", "study_user.name as study_user_name"])
                 ->get();
             $row->deal_details = $deal_details;
             $row->file_study_sum = 0;
@@ -746,7 +746,6 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
             "total_file_sum" => $total_file_sum,
             "total_resident_sum" => $total_resident_sum,
         ];
-        // dd($data);
         return $data;
     }
 }

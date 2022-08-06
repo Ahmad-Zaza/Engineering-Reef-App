@@ -420,14 +420,12 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
 
         if (Request::get('file') && Request::get('resume') == 1) {
             $total = Session::get('total_data_import');
-            $prog = 0;
-            if ($total > 0) {
-                $prog = intval(Cache::get('success_' . $file_md5)) / $total * 100;
-            }
-            $prog = round($prog);
+            $prog = intval(Cache::get('success_' . $file_md5)) / $total * 100;
+            $prog = round($prog, 2);
             if ($prog >= 100) {
                 Cache::forget('success_' . $file_md5);
             }
+
             return response()->json(['progress' => $prog, 'last_error' => Cache::get('error_' . $file_md5)]);
         }
 
@@ -449,45 +447,51 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
         $engineers = DB::table('cms_users')->where("id_cms_privileges", 2)->pluck("id", "num")->toArray();
         $dealsArr = DB::table('v_residents_deals')->get()->toArray();
         foreach ($rows as $value) {
-            if (!$value["rkm_almaaaml"] || !$value["rkm_almhnds"] || !$value["rkm_almthkr"]) {
-                continue;
-            }
-            $total_file_records++;
-            if (!$engineers[$value["rkm_almhnds"]]) {
-                $failedError[] = $value->toArray();
-                $total_failed++;
-                continue;
-            }
-            $deal = array_values(array_filter(
-                $dealsArr,
-                function ($item) use ($value) {
-                    return $item->file_num == intval($value["rkm_almaaaml"]) && $item->file_date == $value["tarykh_almaaaml"]->format("Y-m-d");
-                }))[0];
-            if (!$deal && is_numeric($value["rkm_almaaaml"])) {
-                $deal = Deal::create([
-                    "operation_id" => $operation->id,
-                    "file_num" => $value["rkm_almaaaml"],
-                    "file_date" => $value["tarykh_almaaaml"]->format("Y-m-d"),
-                    "owner_name" => $value["sahb_alaalak"],
-                    "real_estate_area" => $value["almntk_alaakary"],
-                    "real_estate_num" => $value["arkam_alaakarat"],
-                ]);
-                $dealsArr[] = (object) $deal->toArray();
-            }
-            $engineer_id = $engineers[$value["rkm_almhnds"]];
-            $deal_id = $deal->id;
-            $paidDealData = [
-                "operation_id" => $operation->id,
-                "deal_id" => $deal_id,
-                "engineer_id" => $engineer_id,
-                "year" => $value["alaaam"],
-                "month" => $value["alshhr"],
-                "note_num" => $value["rkm_almthkr"],
-                "note_date" => $value["tarykh_almthkr"],
-                "application_date" => $value["tarykh_alttbyk"],
-                "total_amount" => $value["almblgh"],
-            ];
             try {
+                if (!$value["rkm_almaaaml"] || !$value["rkm_almhnds"]) {
+                    continue;
+                }
+                $total_file_records++;
+                if (!$engineers[$value["rkm_almhnds"]]) {
+                    $failedError[] = $value->toArray();
+                    $total_failed++;
+                    continue;
+                }
+                $deal = array_values(array_filter(
+                    $dealsArr,
+                    function ($item) use ($value) {
+                        return $item->file_num == intval($value["rkm_almaaaml"]) && $item->file_date == $value["tarykh_almaaaml"]->format("Y-m-d");
+                    }))[0];
+                if (!$deal && is_numeric($value["rkm_almaaaml"])) {
+                    $file_engineer_id = null;
+                    if(optional($value)["rkm_mhnds_almaaaml"])
+                        $file_engineer_id = $engineers[$value["rkm_mhnds_almaaaml"]];
+                    $deal = Deal::create([
+                        "operation_id" => $operation->id,
+                        "file_num" => $value["rkm_almaaaml"],
+                        "file_date" => $value["tarykh_almaaaml"]->format("Y-m-d"),
+                        "owner_name" => $value["sahb_alaalak"],
+                        "real_estate_area" => $value["almntk_alaakary"],
+                        "confinement_area" => optional($value)["mntk_alhsr"],
+                        "real_estate_num" => $value["arkam_alaakarat"],
+                        "file_engineer_id" => $value["file_engineer_id"],
+                    ]);
+                    $dealsArr[] = (object) $deal->toArray();
+                }
+                $engineer_id = $engineers[$value["rkm_almhnds"]];
+                $deal_id = $deal->id;
+                $paidDealData = [
+                    "operation_id" => $operation->id,
+                    "deal_id" => $deal_id,
+                    "engineer_id" => $engineer_id,
+                    "year" => $value["alaaam"],
+                    "month" => $value["alshhr"],
+                    "note_num" => $value["rkm_almthkr"],
+                    "note_date" => $value["tarykh_almthkr"],
+                    "application_date" => $value["tarykh_alttbyk"],
+                    "total_amount" => $value["almblgh"],
+                ];
+
                 PaidDeal::create($paidDealData);
                 $total_successfully++;
                 Cache::increment('success_' . $file_md5);
