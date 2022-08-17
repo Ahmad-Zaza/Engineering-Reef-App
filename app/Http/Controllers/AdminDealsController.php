@@ -461,7 +461,10 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
 
         if (Request::get('file') && Request::get('resume') == 1) {
             $total = Session::get('total_data_import');
-            $prog = intval(Cache::get('success_' . $file_md5)) / $total * 100;
+            $prog = 0;
+            if ($total > 0) {
+                $prog = intval(Cache::get('success_' . $file_md5)) / $total * 100;
+            }
             $prog = round($prog, 2);
             if ($prog >= 100) {
                 Cache::forget('success_' . $file_md5);
@@ -487,6 +490,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
         ]);
         $engineers = DB::table('cms_users')->where("id_cms_privileges", 2)->pluck("id", "num")->toArray();
         $dealsArr = DB::table('deals')->where("deleted_at", null)->get()->toArray();
+        $addedDeal = null;
         foreach ($rows as $value) {
             if (!$value["rkm_almaaaml"]) {
                 $failedError[] = $value;
@@ -542,10 +546,16 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
                 $deal = array_values(array_filter(
                     $dealsArr,
                     function ($item) use ($value) {
-                        return $item->file_num == intval($value["rkm_almaaaml"]) && $item->file_date->format("Y-m-d") == $value["tarykh_almaaaml"]->format("Y-m-d");
+                        if (is_string($item->file_date)) {
+                            return $item->file_num == intval($value["rkm_almaaaml"]) && $item->file_date == $value["tarykh_almaaaml"]->format("Y-m-d");
+                        } else {
+                            return $item->file_num == intval($value["rkm_almaaaml"]) && $item->file_date->format("Y-m-d") == $value["tarykh_almaaaml"]->format("Y-m-d");
+                        }
+
                     }))[0];
                 if (!$deal) {
                     $deal = Deal::create($dealData);
+                    $addedDeal = $deal;
                     $dealsArr[] = (object) $deal->toArray();
                     $deals[$value["rkm_almaaaml"]] = $deal->id;
                     DealDetail::where("deal_id", $deal->id)->delete();
@@ -726,7 +736,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
                 ->leftjoin("cms_users as study_user", "deal_details.study_engineer_id", "=", "study_user.id")
                 ->leftjoin("study_types", "deal_details.study_name", "=", "study_types.name")
                 ->orderby("study_types.sorting", "asc")
-                ->select(["study_user.num as study_user_num", "study_user.name as study_user_name"])
+                ->select(["*", "study_user.num as study_user_num", "study_user.name as study_user_name"])
                 ->get();
             $row->deal_details = $deal_details;
             $row->file_study_sum = 0;

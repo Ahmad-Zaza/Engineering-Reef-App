@@ -38,7 +38,7 @@ class AdminPaidDeals130Controller extends \crocodicstudio_voila\crudbooster\cont
         $this->button_detail = false;
         $this->button_show = false;
         $this->button_filter = true;
-        $this->button_export = true;
+        $this->button_export = false;
         $this->button_import = CRUDBooster::me()->id_cms_privileges == 1;
         $this->button_bulk_action = true;
         $this->sidebar_mode = "normal"; //normal,mini,collapse,collapse-mini
