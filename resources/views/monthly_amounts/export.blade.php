@@ -4,7 +4,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 <style>
-
     * {
         /* font-family: DejaVu Sans, sans-serif; */
         direction: rtl;
@@ -15,124 +14,122 @@
 @php
 @endphp
 
-@if(!$cms_users_num)
-<h3>
-    لايوجد بيانات متوفرة
-</h3>
+@if (!$cms_users_num)
+    <h3>
+        لايوجد بيانات متوفرة
+    </h3>
 @else
-<body>
-    
-    <table cellpadding="2" cellspacing="4" border="0" style="border-collapse: collapse;" width="100%">
-        <tbody>
-            <tr>
-                <td></td>
-            </tr>
-            <tr nobr="true" style="">
-                <td align="center" style="font-family:arialbd;">
-                    جدول المبالغ المالية للمهندس: {{$cms_users_name ." - ". $cms_users_num }}
-                </td>
-            </tr>
-            <tr>
-                <td align="center" style="font-family:arialbd;">للشهر {{ $financial_month }} السنة {{ $financial_year }}</td>
-            </tr>
-        </tbody>
-    </table>
-    <table cellpadding="5" border="0" style="border-collapse: collapse;margin-right:auto;margin-left:auto" width="100%">
-        <tbody>
-            <tr nobr="true">
-                <td></td>
-                <td style="border: 0.7px solid #494444;font-family:arialbd;background-color: #9b9999;">العامل</td>
-                <td style="border: 0.7px solid #494444;background-color: #9b9999;">{{ $factor }}</td>
-                <td></td>
-            </tr>
-            <tr nobr="true">
-                <td></td>
-                <td style="border: 0.7px solid #494444;font-family:arialbd;">النظام المالي</td>
-                <td style="border: 0.7px solid #494444;">{{ $financial_system }}</td>
-                <td></td>
-            </tr>
-            <tr nobr="true">
-                <td></td>
-                <td style="border: 0.7px solid #494444;font-family:arialbd;background-color: #9b9999;">النسبة</td>
-                <td style="border: 0.7px solid #494444;background-color: #9b9999;">{{ $percent }}</td>
-                <td></td>
-            </tr>
-            <tr nobr="true">
-                <td></td>
-                <td style="border: 0.7px solid #494444;font-family:arialbd;">الأتعاب</td>
-                <td style="border: 0.7px solid #494444;">{{ $effort }}</td>
-                <td></td>
-            </tr>
-            <tr nobr="true">
-                <td></td>
-                <td style="border: 0.7px solid #494444;font-family:arialbd;background-color: #9b9999;">الحصة</td>
-                <td style="border: 0.7px solid #494444;background-color: #9b9999;">{{ round($effort_percent,2) }}</td>
-                <td></td>
-            </tr>
-            <tr nobr="true">
-                <td></td>
-                <td style="border: 0.7px solid #494444;font-family:arialbd;">مورد المشترك</td>
-                <td style="border: 0.7px solid #494444;">{{ round($share_in,2) }}</td>
-                <td></td>
-            </tr>
-            <tr nobr="true">
-                <td></td>
-                <td style="border: 0.7px solid #494444;font-family:arialbd;background-color: #9b9999;">مقبوض المشترك</td>
-                <td style="border: 0.7px solid #494444;background-color: #9b9999;">{{ round($share_out,2) }}</td>
-                <td></td>
-            </tr>
-            <tr nobr="true">
-                <td></td>
-                <td style="border: 0.7px solid #494444;font-family:arialbd;">مقبوض التدقيق</td>
-                <td style="border: 0.7px solid #494444;">{{ round($veri_out,2) }}</td>
-                <td></td>
-            </tr>
-            <tr nobr="true">
-                <td></td>
-                <td style="border: 0.7px solid #494444;font-family:arialbd;background-color: #9b9999;">رديات مقيم</td>
-                <td style="border: 0.7px solid #494444;background-color: #9b9999;">{{ round($resident_out,2) }}</td>
-                <td></td>
-            </tr>
-            <tr nobr="true">
-                <td></td>
-                <td style="border: 0.7px solid #494444;font-family:arialbd;">رديات إضبارة</td>
-                <td style="border: 0.7px solid #494444;">{{ round($folder_out,2) }}</td>
-                <td></td>
-            </tr>
-            <tr nobr="true">
-                <td></td>
-                <td style="border: 0.7px solid #494444;font-family:arialbd;background-color: #9b9999;">إشراف</td>
-                <td style="border: 0.7px solid #494444;background-color: #9b9999;">{{ $supervision }}</td>
-                <td></td>
-            </tr>
-            <tr nobr="true">
-                <td></td>
-                <td style="border: 0.7px solid #494444;font-family:arialbd;">الحسميات</td>
-                <td style="border: 0.7px solid #494444;">{{ $discount }}</td>
-                <td></td>
-            </tr>
-            <tr nobr="true">
-                <td></td>
-                <td style="border: 0.7px solid #494444;font-family:arialbd;background-color: #9b9999;">التعويضات</td>
-                <td style="border: 0.7px solid #494444;background-color: #9b9999;">{{ $compensation }}</td>
-                <td></td>
-            </tr>
-            <tr nobr="true">
-                <td></td>
-                <td style="border: 0.7px solid #494444;font-family:arialbd;">المقبوض الكلي</td>
-                <td style="border: 0.7px solid #494444;">{{ $total_amount }}</td>
-                <td></td>
-            </tr>
-            <tr nobr="true">
-                <td></td>
-                <td style="border: 0.7px solid #494444;font-family:arialbd;background-color: #9b9999;">ملاحظات</td>
-                <td style="border: 0.7px solid #494444;background-color: #9b9999;">{{ $notes }}</td>
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
 
+    <body>
+        <table>
+            <tbody>
+                <tr>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+        <table cellpadding="2" cellspacing="4" border="0" style="border-collapse: collapse;background-color: #9b9999;"
+            width="100%">
+            <tbody>
+                <tr nobr="true" style="">
+                    <td width="24%" style="font-family:arialbd;">
+                        المبالغ المالية للمهندس:</td>
+                    <td width="10%" style="border: 0.7px solid #494444;font-family:arialbd;background-color:white;">
+                        &nbsp;{{ $cms_users_num }}&nbsp;
+                    </td>
+                    <td width="35.5%" style="border: 0.7px solid #494444;font-family:arialbd;background-color:white;">
+                        {{ $cms_users_name }}
+                    </td>
+                    <td width="12%"></td>
+                    <td width="6%" style="font-family:arialbd;">للشهر:</td>
+                    <td width="12.5%" style="font-family:arialbd;border: 0.7px solid #494444;background-color:white;">
+                        {{ $financial_month }} - {{ $financial_year }}</td>
 
-</body>
+                </tr>
+                
+            </tbody>
+        </table>
+
+        <table cellpadding="2" border="0" style="border-collapse: collapse;" width="100%">
+            <tbody>
+                <tr>
+                    <td style="line-height: 1px;" colspan="6"></td>
+                </tr>
+                <table cellpadding="2" cellspacing="4" border="0" style="border-collapse: collapse;border: 0.7px solid #494444;"
+                    width="100%">
+                    <tbody>
+                        <tr>
+                            <td style="line-height: 1px;" colspan="6"></td>
+                        </tr>
+                        <tr nobr="true">
+                            <td style="font-family:arialbd;">العامل</td>
+                            <td style="border: 0.7px solid #494444;">{{ $factor }}</td>
+                            <td style="font-family:arialbd;">النظام المالي</td>
+                            <td style="border: 0.7px solid #494444;">{{ $financial_system }}</td>
+                            <td style="font-family:arialbd;">النسبة</td>
+                            <td style="border: 0.7px solid #494444;">{{ $percent }}</td>
+                        </tr>
+                        <tr>
+                            <td style="line-height: 1px;" colspan="6"></td>
+                        </tr>
+                        <tr nobr="true">
+                            <td style="font-family:arialbd;">الأتعاب</td>
+                            <td style="border: 0.7px solid #494444;">{{ $effort }}</td>
+                            <td style="font-family:arialbd;">الحصة</td>
+                            <td style="border: 0.7px solid #494444;">{{ round($effort_percent, 2) }}</td>
+                            <td style="font-family:arialbd;">مورد المشترك</td>
+                            <td style="border: 0.7px solid #494444;">{{ round($share_in, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="line-height: 1px;" colspan="6"></td>
+                        </tr>
+                        <tr nobr="true">
+                            <td style="font-family:arialbd;">مقبوض المشترك</td>
+                            <td style="border: 0.7px solid #494444;">{{ round($share_out, 2) }}</td>
+                            <td style="font-family:arialbd;">مقبوض التدقيق</td>
+                            <td style="border: 0.7px solid #494444;">{{ round($veri_out, 2) }}</td>
+                            <td style="font-family:arialbd;">رديات مقيم</td>
+                            <td style="border: 0.7px solid #494444;">{{ round($resident_out, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td style="line-height: 1px;" colspan="6"></td>
+                        </tr>
+                        <tr nobr="true">
+                            <td style="font-family:arialbd;">رديات إضبارة</td>
+                            <td style="border: 0.7px solid #494444;">{{ round($folder_out, 2) }}</td>
+                            <td style="font-family:arialbd;">إشراف</td>
+                            <td style="border: 0.7px solid #494444;">{{ $supervision }}</td>
+                            <td style="font-family:arialbd;">الحسميات</td>
+                            <td style="border: 0.7px solid #494444;">{{ $discount }}</td>
+                        </tr>
+                        <tr>
+                            <td style="line-height: 1px;" colspan="6"></td>
+                        </tr>
+                        <tr nobr="true">
+                            <td style="font-family:arialbd;">التعويضات</td>
+                            <td style="border: 0.7px solid #494444;">{{ $compensation }}</td>
+                            <td style="font-family:arialbd;">ملاحظات</td>
+                            <td style="border: 0.7px solid #494444;">{{ $notes }}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td style="line-height: 1px;" colspan="6"></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td style="font-family:arialbd;background-color: #9b9999">المقبوض الكلي</td>
+                            <td style="font-family:arialbd;background-color: #9b9999">{{ $total_amount }}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </tbody>
+        </table>
+
+    </body>
 @endif
+
 </html>

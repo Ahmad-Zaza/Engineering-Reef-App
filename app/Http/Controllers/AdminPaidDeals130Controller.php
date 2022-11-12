@@ -266,7 +266,7 @@ class AdminPaidDeals130Controller extends \crocodicstudio_voila\crudbooster\cont
         if ((!Request::get('year') || !Request::get('month') || !Request::get('engineer')) && CrudBooster::me()->id_cms_privileges == 1) {
             $query->where("deals.id", "-1");
         } else if ((!Request::get('year') || !Request::get('month')) && CrudBooster::me()->id_cms_privileges == 2) {
-            $query->where("paid_deals.id", "-1");
+            $query->where("deals.id", "-1");
         }
         //-------------------------//
         if (Request::get('year')) {
@@ -440,7 +440,7 @@ class AdminPaidDeals130Controller extends \crocodicstudio_voila\crudbooster\cont
             "total_studies_before" => PaidDeal::whereNull("deleted_at")->get()->count(),
         ]);
         $engineers = DB::table('cms_users')->where("id_cms_privileges", 2)->pluck("id", "num")->toArray();
-        $dealsArr = DB::table('v_residents_deals')->get()->toArray();
+        $dealsArr = DB::table('v_residents_deals')->whereNull("deleted_at")->get()->toArray();
         foreach ($rows as $value) {
             try {
                 if (!$value["rkm_almaaaml"] || !$value["rkm_almhnds"]) {

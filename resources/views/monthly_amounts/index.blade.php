@@ -35,6 +35,7 @@
                             $months = Db::table('financial_deals')
                                 ->distinct('financial_month')
                                 ->select('financial_month')
+                                ->orderby('financial_month')
                                 ->get()
                                 ->pluck('financial_month');
                         @endphp

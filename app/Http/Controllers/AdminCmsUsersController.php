@@ -6,6 +6,7 @@ use crocodicstudio_voila\crudbooster\helpers\CRUDBooster;
 // use DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
@@ -169,7 +170,6 @@ class AdminCmsUsersController extends \crocodicstudio_voila\crudbooster\controll
         if (Request::get('file') && Request::get('resume') == 1) {
             $total = Session::get('total_data_import');
             $prog = intval(Cache::get('success_' . $file_md5)) / $total * 100;
-            // $prog = round($prog, 2);
             $prog = round($prog);
             if ($prog >= 100) {
                 Cache::forget('success_' . $file_md5);
@@ -201,14 +201,14 @@ class AdminCmsUsersController extends \crocodicstudio_voila\crudbooster\controll
                 $a[$colname] = $value->$s;
                 $a["photo"] = "/images/portfolio1_logo.png";
                 $a["id_cms_privileges"] = "2";
-                if ($colname == "password") {
+                if ($colname == "password" && $value->$s) {
                     $a[$colname] = password_hash($value->$s, PASSWORD_DEFAULT);
                 }
             }
             if (!$a["username"]) {
                 $a["username"] = $a["num"];
             }
-            $user = DB::table($this->table)->where("num", $a["num"])->get();
+            $user = DB::table($this->table)->where("num", $a["num"])->first();
             if (!$a["password"] && !$user) {
                 $a["password"] = $password;
             }
@@ -218,7 +218,8 @@ class AdminCmsUsersController extends \crocodicstudio_voila\crudbooster\controll
                 if ($has_created_at) {
                     $a['created_at'] = date('Y-m-d H:i:s');
                 }
-                if ($user->count() > 0) {
+                $a['username'] = $a['num'];
+                if ($user) {
                     DB::table($this->table)->where("id", $user->id)->update([
                         "office_status" => $a["office_status"],
                         "cota" => $a["cota"],
@@ -231,6 +232,7 @@ class AdminCmsUsersController extends \crocodicstudio_voila\crudbooster\controll
             } catch (\Exception $e) {
                 $e = (string) $e;
                 Cache::put('error_' . $file_md5, $e, 500);
+                Log::log("error","Error importing users files $e");
             }
         }
 

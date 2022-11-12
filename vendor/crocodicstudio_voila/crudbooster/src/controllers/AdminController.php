@@ -65,6 +65,12 @@ class AdminController extends CBController
         $email = Request::input("email");
         $password = Request::input("password");
         $confirm_password = Request::input("confirm_password");
+        //--- Check Email
+        $emailUsers = DB::table(config('crudbooster.USER_TABLE'))->where("email", $email)->where("id", "<>", CRUDBooster::myId())->get();
+        if($emailUsers > 0){
+            return redirect()->back()->with(['message' => "البريد الالكتروني موجود مسبقاً, الرجاء إدخال بريد الكتروني مختلف", 'message_type' => 'danger']);
+        }
+        //-----------------------------------//
         $users = DB::table(config('crudbooster.USER_TABLE'))->where("id", CRUDBooster::myId())->first();
         if (isset($users) && !empty($users)) {
             $new_password = Hash::make($password);
@@ -165,7 +171,7 @@ class AdminController extends CBController
             'data' => [
                 "pass" => $rand_string,
                 "name" => $user->name,
-            ], 
+            ],
             'template' => 'forgot_password_backend']);
 
         CRUDBooster::insertLog(trans("crudbooster.log_forgot", ['email' => g('email'), 'ip' => Request::server('REMOTE_ADDR')]));

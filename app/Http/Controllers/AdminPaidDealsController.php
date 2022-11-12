@@ -445,7 +445,7 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
             "total_studies_before" => PaidDeal::whereNull("deleted_at")->get()->count(),
         ]);
         $engineers = DB::table('cms_users')->where("id_cms_privileges", 2)->pluck("id", "num")->toArray();
-        $dealsArr = DB::table('v_residents_deals')->get()->toArray();
+        $dealsArr = DB::table('v_residents_deals')->whereNull("deleted_at")->get()->toArray();
         foreach ($rows as $value) {
             try {
                 if (!$value["rkm_almaaaml"] || !$value["rkm_almhnds"]) {

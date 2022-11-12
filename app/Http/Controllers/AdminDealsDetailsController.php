@@ -403,14 +403,14 @@ class AdminDealsDetailsController extends \crocodicstudio_voila\crudbooster\cont
         if (Request::get("year")) {
             $result->where("deals.close_year", Request::get("year"));
         }
-        $result->orderby("file_num", "asc");
+        $result->whereNull("deleted_at")->orderby("file_num", "asc");
         $data['result'] = $result->paginate($limit);
 
         $total_study_sum = 0;
         $total_file_sum = 0;
         $total_resident_sum = 0;
         foreach ($data['result'] as $row) {
-            $deal_details = DB::table("deal_details")
+            $deal_details = DB::table("deal_details")->whereNull("deal_details.deleted_at")
                 ->where("deal_id", $row->id)
                 ->where("study_engineer_id", $study_engineer_id)
                 ->leftjoin("cms_users as study_user", "deal_details.study_engineer_id", "=", "study_user.id")

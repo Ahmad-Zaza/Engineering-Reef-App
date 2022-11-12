@@ -153,7 +153,7 @@
                                 @foreach ($table_columns as $k => $column)
                                     <?php
                                     $help = '';
-                                    if (in_array($column, ['id', 'created_at', 'updated_at', 'deleted_at', 'photo', 'id_cms_privileges'])) {
+                                    if (in_array($column, ['id', 'created_at', 'updated_at', 'deleted_at','password','email','username', 'photo', 'id_cms_privileges'])) {
                                         continue;
                                     }
                                     if (substr($column, 0, 3) == 'id_') {
@@ -171,7 +171,7 @@
                             <tr>
                                 @foreach ($table_columns as $k => $column)
                                     <?php
-                                    if (in_array($column, ['id', 'created_at', 'updated_at', 'deleted_at', 'photo', 'id_cms_privileges'])) {
+                                    if (in_array($column, ['id', 'created_at', 'updated_at', 'deleted_at','email','password','username', 'photo', 'id_cms_privileges'])) {
                                         continue;
                                     } ?>
                                     <td data-no-column='{{ $k }}'>

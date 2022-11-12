@@ -1,4 +1,5 @@
-<?php namespace App\Http\Controllers;
+<?php 
+namespace App\Http\Controllers;
 
 use App\Http\Models\FinancialDeal;
 use App\Http\Models\ImportOperation;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
+use TCPDF;
 use TCPDF_FONTS;
 
 class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\controllers\CBController
@@ -563,7 +565,7 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
         }
         switch ($filetype) {
             case "pdf":
-                $pdf = new MYPDF("P", PDF_UNIT, "A4", true, 'UTF-8', false);
+                $pdf = new MYPDF_("P", PDF_UNIT, "A4", true, 'UTF-8', false);
                 $lg = array();
                 $lg['a_meta_charset'] = 'UTF-8';
                 $lg['a_meta_dir'] = 'rtl';
@@ -652,10 +654,33 @@ class AdminMonthlyAmountsController extends \crocodicstudio_voila\crudbooster\co
         if (Request::get("year")) {
             $result->where("financial_deals.financial_year", Request::get("year"));
         }
-        $result->orderby("id", "desc");
+        $result->whereNull("financial_deals.deleted_at")->orderby("id", "desc");
         $data['result'] = $result->paginate($limit);
         $data['engineer_num'] = $engineer_num;
         $data['engineer_name'] = $engineer_name;
         return $data;
+    }
+}
+class MYPDF_ extends TCPDF
+{
+    // Page footer
+    public function Footer()
+    {
+        // Position at 15 mm from bottom
+        $this->SetY(-15);
+        // Set font
+        $this->SetFont('dejavusans', '', 8);
+        // Page number
+        $this->Cell(0, 10, $this->getAliasNumPage() . '/' . $this->getAliasNbPages() . " " . 'صفحة', 0, false, 'C', 0, '', 0, false, 'T', 'M');
+    }
+
+    public function Header()
+    {
+        $fontFile = $_SERVER["DOCUMENT_ROOT"] . "/fonts/arialbd.ttf";
+        $fontname = TCPDF_FONTS::addTTFfont($fontFile, 'TrueTypeUnicode', '');
+        // // use the font
+        $this->SetFont($fontname, '', 18, '', false);
+
+        $this->Cell(0, 20, 'نقابة المـهـنـدسـيـن فرع ريف دمشق', 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
 }

@@ -1528,7 +1528,6 @@ class CBController extends Controller
         $module = CrudBooster::getCurrentModule();
         $data['page_menu'] = Route::getCurrentRoute()->getActionName();
         $data['page_title'] = 'استيراد البيانات :' . $module->name;
-
         if (Request::get('file') && !Request::get('import')) {
             $file = base64_decode(Request::get('file'));
             $file = storage_path('app/' . $file);

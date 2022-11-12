@@ -319,7 +319,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
         } else if (!Request::get('year') && !Request::get('month') && CrudBooster::me()->id_cms_privileges == 2) {
             $query->where("deals.id", "-1");
         }
-        $query->orderby("deals.file_num", "asc");
+        $query->whereNull("deal_details.deleted_at")->orderby("deals.file_num", "asc");
         $query->orderby("study_types.sorting", "asc");
     }
 
@@ -486,7 +486,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
             "type" => "الأعمال الشهرية",
             "date" => Carbon::now(),
             "file_name" => session("file_name"),
-            "total_studies_before" => DB::table('deal_details')->get()->count(),
+            "total_studies_before" => DB::table('deal_details')->whereNull("deleted_at")->get()->count(),
         ]);
         $engineers = DB::table('cms_users')->where("id_cms_privileges", 2)->pluck("id", "num")->toArray();
         $dealsArr = DB::table('deals')->where("deleted_at", null)->get()->toArray();
@@ -710,11 +710,11 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
         $result->select(["deals.*", "file_user.num as file_user_num", "file_user.name as file_user_name"]);
         if (Request::get("study_engineer") && CRUDBooster::me()->id_cms_privileges == 1) {
             $study_engineer_id = DB::table("cms_users")->where("num", Request::get("study_engineer"))->first()->id;
-            $dealIds = DB::table("deal_details")->where("study_engineer_id", $study_engineer_id)->pluck("deal_id")->toArray();
+            $dealIds = DB::table("deal_details")->whereNull("deleted_at")->where("study_engineer_id", $study_engineer_id)->pluck("deal_id")->toArray();
             $result->whereIn("deals.id", $dealIds);
         } else if (CRUDBooster::me()->id_cms_privileges == 2) {
             $study_engineer_id = CRUDBooster::me()->id;
-            $dealIds = DB::table("deal_details")->where("study_engineer_id", $study_engineer_id)->pluck("deal_id")->toArray();
+            $dealIds = DB::table("deal_details")->whereNull("deleted_at")->where("study_engineer_id", $study_engineer_id)->pluck("deal_id")->toArray();
             $result->whereIn("deals.id", $dealIds);
         }
         if (Request::get("month")) {
@@ -731,7 +731,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
         $total_resident_sum = 0;
         foreach ($data['result'] as $row) {
             $deal_details = DB::table("deal_details")
-                ->where("deal_id", $row->id)
+                ->where("deal_id", $row->id)->whereNull("deal_details.deleted_at")
                 ->where("study_engineer_id", $study_engineer_id)
                 ->leftjoin("cms_users as study_user", "deal_details.study_engineer_id", "=", "study_user.id")
                 ->leftjoin("study_types", "deal_details.study_name", "=", "study_types.name")
