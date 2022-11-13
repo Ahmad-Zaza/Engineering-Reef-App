@@ -46,7 +46,7 @@ class AdminCmsUsersController extends \crocodicstudio_voila\crudbooster\controll
         if (CRUDBooster::me()->id_cms_privileges == 1) {
             $this->form[] = array("label" => "اسم المستخدم", "name" => "username", 'required' => true, 'validation' => 'required|unique:cms_users,username,' . CRUDBooster::getCurrentId());
             $this->form[] = array("label" => "رقم المهندس", "name" => "num", "type" => "number", 'validation' => 'required|unique:cms_users,num,' . CRUDBooster::getCurrentId());
-            $this->form[] = array("label" => "الكوتا", "name" => "cota", "type" => "number", 'validation' => 'unique:cms_users,cota,' . CRUDBooster::getCurrentId());
+            $this->form[] = array("label" => "الكوتا", "name" => "cota", "type" => "number");
             $this->form[] = array("label" => "اسم المهندس", "name" => "name", 'required' => true, 'validation' => 'required|alpha_spaces|min:3');
             $this->form[] = array("label" => "حالة المكتب", "name" => "office_status", 'type' => 'text');
         } else {

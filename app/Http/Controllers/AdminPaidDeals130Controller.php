@@ -39,7 +39,7 @@ class AdminPaidDeals130Controller extends \crocodicstudio_voila\crudbooster\cont
         $this->button_show = false;
         $this->button_filter = true;
         $this->button_export = false;
-        $this->button_import = CRUDBooster::me()->id_cms_privileges == 1;
+        $this->button_import = false;
         $this->button_bulk_action = true;
         $this->sidebar_mode = "normal"; //normal,mini,collapse,collapse-mini
         # END CONFIGURATION DO NOT REMOVE THIS LINE
@@ -531,6 +531,7 @@ class AdminPaidDeals130Controller extends \crocodicstudio_voila\crudbooster\cont
         }
 
     }
+
     public function postDoneImport()
     {
         $this->cbLoader();

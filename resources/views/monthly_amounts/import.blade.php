@@ -67,8 +67,7 @@
 
                             }, 2500);
 
-                            $.post("{{ CRUDBooster::mainpath('do-import-chunk') . '?file=' . Request::get('file') }}", function(
-                                resp) {
+                            $.post("{{ CRUDBooster::mainpath('do-import-chunk') . '?file=' . Request::get('file') }}", function(resp) {
                                 if (resp.status == true) {
                                     $('#progress-import').css('width', '100%');
                                     $('#progress-import').attr('aria-valuenow', 100);
@@ -137,6 +136,10 @@
                         لذلك الرجاء تقسيم الملف إلى 1000 سجل في كل ملف<br />
                         * بنية الجدول: السطر الأول هو الـ Heading والأسطر التالية هي التي ستحتوي على البيانات <br />
                         * إذا احتوى الملف على معاملة موجودة سابقا سيتم تخطيها أثناء الاستيراد<br />
+                        * جميع التواريخ يجب أن تكون من الصيغة التالية:
+                            <br>
+                            d/m/Y
+                            مثلا 10/01/2022<br />
                         * نموذج عن شكل ملف الاستيراد  يحتوي <a href='{{ url('/financial_deals_template.xlsx') }}' target='_blank' class='btn btn-primary'>تحميل</a>
                     </div>
 
