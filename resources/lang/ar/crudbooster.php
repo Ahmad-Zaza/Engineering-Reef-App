@@ -92,7 +92,7 @@ return [
     'action_detail_data' => 'التفاصيل',
     'action_edit_data' => 'تعديل',
     'action_delete_data' => 'حذف',
-    
+
 
     'Cancel' => 'إلغاء',
     'button_cancel' => 'إلغاء',
@@ -114,7 +114,7 @@ return [
     'button_reset' => 'اعادة تعيين',
     'button_add_to_table' => 'أضف إلى الجدول',
     'button_add_to_items' => 'أضف إلى المواد',
-    
+
     'export_dialog_title' => "تصدير البيانات",
     'export_dialog_filename' => 'اسم الملف',
     'export_dialog_help_filename' => 'يمكنك تغيير اسم الملف لما تراه مناسبا',
@@ -277,18 +277,28 @@ return [
     'Name' => 'الاسم',
     'Role' => 'الدور',
     'Add_Role' => 'إضافة دور جديد',
-    'Edit_Role'  => 'تعديل الدور', 
-    'Email'  => 'البريد الإلكتروني', 
-    'Privilege'  => 'الدور', 
-    'Photo'  => 'الصورة', 
-    'Perant_Account'  => 'حساب الأب', 
-    'Inventories'  => 'المستودعات', 
-    'Insert_Image'  => 'إضافة صورة', 
-    'Check_all_vertical'  => 'حدد كل العمود', 
-    'Check_all_horizontal'  => 'حدد كل السطر', 
+    'Edit_Role'  => 'تعديل الدور',
+    'Email'  => 'البريد الإلكتروني',
+    'Privilege'  => 'الدور',
+    'Photo'  => 'الصورة',
+    'Perant_Account'  => 'حساب الأب',
+    'Inventories'  => 'المستودعات',
+    'Insert_Image'  => 'إضافة صورة',
+    'Check_all_vertical'  => 'حدد كل العمود',
+    'Check_all_horizontal'  => 'حدد كل السطر',
     'text_delete' => 'حذف',
-    
-    //''  => '', 
-   
+
+    'file_status'  => [
+        'waiting' => 'قيد الانتظار',
+        'in_importing' => 'قيد المعالجة',
+        'done' => 'تم المعالجة'
+    ],
+    'file_type' => [
+        'paid_stays' => 'اقامات مسددة',
+        'deals' => 'الأعمال الشهرية',
+        'monthly_ammounts' => 'القبض الشهري',
+        'personal' => 'الذاتية'
+    ]
+
 
 ];

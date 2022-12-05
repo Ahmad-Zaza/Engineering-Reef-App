@@ -67,7 +67,8 @@
 
                             }, 2500);
 
-                            $.post("{{ CRUDBooster::mainpath('do-import-chunk') . '?file=' . Request::get('file') }}", function(resp) {
+                            $.post("{{ CRUDBooster::mainpath('do-import-chunk') . '?file=' . Request::get('file') }}", function(
+                                resp) {
                                 if (resp.status == true) {
                                     $('#progress-import').css('width', '100%');
                                     $('#progress-import').attr('aria-valuenow', 100);
@@ -76,6 +77,13 @@
                                     clearInterval(int_prog);
                                     $('#upload-footer').show();
                                     console.log('Import Success');
+                                } else {
+                                    $('#progress-import').css('width', '0%');
+                                    $('#progress-import').attr('aria-valuenow', 0);
+                                    $('#status-import').addClass('text-danger').html(
+                                        "<i class='fa fa-close-square-o'></i>حدثت مشكلة لم يتم استيراد البيانات!");
+                                    clearInterval(int_prog);
+                                    $('#upload-footer').show();
                                 }
                             })
 

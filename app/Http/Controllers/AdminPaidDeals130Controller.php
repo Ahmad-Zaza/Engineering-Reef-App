@@ -531,7 +531,6 @@ class AdminPaidDeals130Controller extends \crocodicstudio_voila\crudbooster\cont
         }
 
     }
-
     public function postDoneImport()
     {
         $this->cbLoader();

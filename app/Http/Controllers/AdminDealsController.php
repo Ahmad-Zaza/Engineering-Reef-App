@@ -27,28 +27,26 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
     public function cbInit()
     {
 
-        # START CONFIGURATION DO NOT REMOVE THIS LINE
-        $this->title_field = "deal_engineer_name";
-        $this->limit = "20";
-        $this->global_privilege = false;
-        $this->button_table_action = true;
-        $this->button_bulk_action = false;
-        $this->button_table_action = false;
-        $this->button_action_style = "button_icon";
-        $this->button_action_width = "10px";
-        $this->button_add = false;
-        $this->button_edit = false;
-        $this->button_delete = false;
-        $this->button_detail = false;
-        $this->button_show = true;
-        $this->button_filter = false;
-        $this->button_import = CRUDBooster::me()->id_cms_privileges == 1;
-        $this->button_export = true;
-        $this->show_numbering = true;
-        $this->table = "deals";
-        # END CONFIGURATION DO NOT REMOVE THIS LINE
+			# START CONFIGURATION DO NOT REMOVE THIS LINE
+			$this->title_field = "deal_engineer_name";
+			$this->limit = "20";
+			$this->orderby = "";
+			$this->global_privilege = false;
+			$this->button_table_action = false;
+			$this->button_bulk_action = false;
+			$this->button_action_style = "button_icon";
+			$this->button_add = false;
+			$this->button_edit = false;
+			$this->button_delete = false;
+			$this->button_detail = false;
+			$this->button_show = true;
+			$this->button_filter = false;
+			$this->button_import = false;
+			$this->button_export = true;
+			$this->table = "deals";
+			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
-        # START COLUMNS DO NOT REMOVE THIS LINE
+			# START COLUMNS DO NOT REMOVE THIS LINE
         $this->col = [];
         $this->col[] = ["label" => "رقم المعاملة", "name" => "deals.file_num"];
         $this->col[] = ["label" => "تاريخ المعاملة", "name" => "deals.file_date"];
@@ -588,7 +586,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
         $this->cbLoader();
         ini_set('memory_limit', '-1');
         $data['page_menu'] = Route::getCurrentRoute()->getActionName();
-        $data['page_title'] = trans('crudbooster.import_page_title', ['module' => "deals"]);
+        //$data['page_title'] = trans('crudbooster.import_page_title', ['module' => "deals"]);
         Session::put('select_column', Request::get('select_column'));
 
         if (view()->exists(CrudBooster::getCurrentModule()->path . '.import')) {

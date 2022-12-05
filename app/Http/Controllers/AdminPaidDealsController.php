@@ -23,28 +23,27 @@ class AdminPaidDealsController extends \crocodicstudio_voila\crudbooster\control
 
     public function cbInit()
     {
-        # START CONFIGURATION DO NOT REMOVE THIS LINE
-        $this->table = "paid_deals";
-        $this->title_field = "id";
-        $this->limit = 20;
-        $this->orderby = "id,desc";
-        $this->show_numbering = false;
-        $this->global_privilege = false;
-        $this->button_table_action = true;
-        $this->button_action_style = "button_icon";
-        $this->button_add = false;
-        $this->button_delete = false;
-        $this->button_edit = false;
-        $this->button_detail = false;
-        $this->button_show = false;
-        $this->button_filter = true;
-        $this->button_export = true;
-        $this->button_import = CRUDBooster::me()->id_cms_privileges == 1;
-        $this->button_bulk_action = true;
-        $this->sidebar_mode = "normal"; //normal,mini,collapse,collapse-mini
-        # END CONFIGURATION DO NOT REMOVE THIS LINE
 
-        # START COLUMNS DO NOT REMOVE THIS LINE
+			# START CONFIGURATION DO NOT REMOVE THIS LINE
+			$this->title_field = "id";
+			$this->limit = "20";
+			$this->orderby = "id,desc";
+			$this->global_privilege = false;
+			$this->button_table_action = true;
+			$this->button_bulk_action = true;
+			$this->button_action_style = "button_icon";
+			$this->button_add = false;
+			$this->button_edit = false;
+			$this->button_delete = false;
+			$this->button_detail = false;
+			$this->button_show = false;
+			$this->button_filter = true;
+			$this->button_import = false;
+			$this->button_export = true;
+			$this->table = "paid_deals";
+			# END CONFIGURATION DO NOT REMOVE THIS LINE
+
+			# START COLUMNS DO NOT REMOVE THIS LINE
         $this->col = [];
         $this->col[] = array("label" => "رقم المهندس", "name" => "paid_deals.engineer_id", "join" => "cms_users,num","visible"=>false);
         $this->col[] = array("label" => "اسم المهندس", "name" => "cms_users.name","visible"=>false);
