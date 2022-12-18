@@ -43,6 +43,7 @@ class AdminDealsController extends \crocodicstudio_voila\crudbooster\controllers
 			$this->button_filter = false;
 			$this->button_import = false;
 			$this->button_export = true;
+            $this->show_numbering = true;
 			$this->table = "deals";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 

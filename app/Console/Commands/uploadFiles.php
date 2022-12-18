@@ -44,9 +44,19 @@ class uploadFiles extends Command
             foreach ($files as $file) {
                 if ($file->file_status != trans('crudbooster.file_status.waiting')) // check the file status
                     continue;
-                $filePath = storage_path($file->path);
+                $filePath = storage_path('app/' . $file->path);
                 $rows = Excel::load($filePath, function ($reader) {
                 })->get();
+                $headerRow = $rows[0]->keys()->toArray();
+                $checkCurrectFileType = $this->checkTypeValidate($file->type, $headerRow);
+                if (!$checkCurrectFileType) {
+                    $file->update([
+                        'file_status' => trans('crudbooster.file_status.failed'),
+                        'updated_at' => Carbon::now(),
+                    ]);
+                    exit;
+                }
+                //---------------------------
                 switch ($file->type) {
                     case trans('crudbooster.file_type.personal'):
                         $this->readPersonalsData($file, $rows);
@@ -69,7 +79,7 @@ class uploadFiles extends Command
 
         // write from temporary table to original table
         foreach ($files as $file) {
-            if ($file->file_status == trans('crudbooster.file_status.done')) // check the file status is not done yet
+            if ($file->file_status == trans('crudbooster.file_status.done') || $file->file_status == trans('crudbooster.file_status.failed')) // check the file status is not done yet
                 continue;
             switch ($file->type) {
                 case trans('crudbooster.file_type.personal'):
@@ -90,24 +100,24 @@ class uploadFiles extends Command
 
     public function readPersonalsData($file, $rows)
     {
-        $total_successfully = 0;
-        $total_failed = 0;
-        $total_file_records = 0;
         foreach ($rows as $key => $value) {
-            TempUser::create([
-                'num' => $value['number'],
-                'name' => $value['name'],
-                'office_status' => $value['status'],
-                'cota' => $value['cota'],
-                'operation_id' => $file->id,
-            ]);
-            $total_successfully++;
+            try {
+                TempUser::create([
+                    'num' => $value['number'] ?? null,
+                    'name' => $value['name'] ?? null,
+                    'office_status' => $value['status'] ?? null,
+                    'cota' => $value['cota'] ?? null,
+                    'operation_id' => $file->id,
+                ]);
+            } catch (Exception $ex) {
+                Log::log("error", "Error whilke create temp users $ex");
+            }
         }
         $file->update([
             'file_status' => trans('crudbooster.file_status.in_importing'),
-            'total_successfully' => $total_successfully,
+            'total_successfully' => 0,
             'total_file_records' => count($rows),
-            'total_failed' => $total_failed
+            'total_failed' => 0
         ]);
         exit;
     }
@@ -160,14 +170,15 @@ class uploadFiles extends Command
                 Log::log("error", "Error importing users files $e");
             }
         }
-        $file->update(['file_status' => trans('crudbooster.file_status.done')]);
+        $file->update([
+            'file_status' => $file->total_failed == 0 ? trans('crudbooster.file_status.done') : trans('crudbooster.file_status.failed'),
+            'total_successfully' => ($file->total_file_records - $file->total_failed),
+            'updated_at' => Carbon::now(),
+        ]);
     }
 
     public function readDealsData($file, $rows)
     {
-        $total_failed = 0;
-        $total_successfully = 0;
-        $total_file_records = 0;
         foreach ($rows as $value) {
             $real_estate_num = $value['rkm_alaakar'] == ":" ? "" : explode(":", $value['rkm_alaakar']);
             $noteData = explode(" : ", $value["rkm_otarykh_almthkr"]);
@@ -211,8 +222,8 @@ class uploadFiles extends Command
         }
         $file->update([
             "total_file_records" => count($rows),
-            "total_successfully" => $total_successfully,
-            "total_failed" => $total_failed,
+            "total_successfully" => 0,
+            "total_failed" => 0,
             'file_status' => trans('crudbooster.file_status.in_importing'),
         ]);
         exit;
@@ -288,16 +299,14 @@ class uploadFiles extends Command
             $value->delete();
         }
         $file->update([
-            "file_status" => trans('crudbooster.file_status.done'),
+            'file_status' => $file->total_failed == 0 ? trans('crudbooster.file_status.done') : trans('crudbooster.file_status.failed'),
             'total_successfully' => ($file->total_file_records - $file->total_failed),
+            'updated_at' => Carbon::now(),
         ]);
     }
 
     public function readPaidStaysData($file, $rows)
     {
-        $total_failed = 0;
-        $total_successfully = 0;
-        $total_file_records = 0;
         foreach ($rows as $value) {
             $paidDealData = [
                 "operation_id" => $file->id,
@@ -319,8 +328,8 @@ class uploadFiles extends Command
             TempPaidDeal::create($paidDealData);
         }
         $file->update([
-            'total_failed' => $total_failed,
-            'total_successfully' => $total_successfully,
+            'total_failed' => 0,
+            'total_successfully' => 0,
             'total_file_records' => count($rows),
             'file_status' => trans('crudbooster.file_status.in_importing'),
         ]);
@@ -399,16 +408,14 @@ class uploadFiles extends Command
             $value->delete();
         }
         $file->update([
-            'file_status' => trans('crudbooster.file_status.done'),
+            'file_status' => $file->total_failed == 0 ? trans('crudbooster.file_status.done') : trans('crudbooster.file_status.failed'),
             'total_successfully' => ($file->total_file_records - $file->total_failed),
+            'updated_at' => Carbon::now(),
         ]);
     }
 
     public function readFinancialDealsData($file, $rows)
     {
-        $total_successfully = 0;
-        $total_file_records = 0;
-        $total_failed = 0;
         foreach ($rows as $value) {
             $financialDealData = [
                 "operation_id" => $file->id,
@@ -435,16 +442,15 @@ class uploadFiles extends Command
         }
         $file->update([
             'file_status' => trans('crudbooster.file_status.in_importing'),
-            'total_successfully' => $total_successfully,
+            'total_successfully' => 0,
             'total_file_records' => count($rows),
-            'total_failed' => $total_failed
+            'total_failed' => 0
         ]);
         exit;
     }
 
     public function writeFinancialDealsData($file)
     {
-
         $engineers = DB::table('cms_users')->where("id_cms_privileges", 2)->pluck("id", "num")->toArray();
         $tempItems = TempFinancialDeals::where('operation_id', $file->id)->orderBy('id')->get();
         foreach ($tempItems as $value) {
@@ -484,8 +490,38 @@ class uploadFiles extends Command
             $value->delete();
         }
         $file->update([
-            'file_status' => trans('crudbooster.file_status.done'),
+            'file_status' => $file->total_failed == 0 ? trans('crudbooster.file_status.done') : trans('crudbooster.file_status.failed'),
             'total_successfully' => ($file->total_file_records - $file->total_failed),
+            'updated_at' => Carbon::now(),
         ]);
+    }
+
+    public function checkTypeValidate($type, $headerRow)
+    {
+        $checkMap = null;
+        switch ($type) {
+            case trans('crudbooster.file_type.deals'):
+                $dealsMap = ['rkm_mhnds_aldras' => 0, 'asm_mhnds_aldras' => 0, 'rkm_almaaaml' => 0, 'tarykh_almaaaml' => 0, 'rkm_otarykh_almthkr' => 0, 'noaa_almaaaml' => 0, 'mntk_alhsr' => 0, 'almntk_alaakary' => 0, 'sahb_alaalak' => 0, 'rkm_mhnds_almaaaml' => 0, 'asm_mhnds_almaaaml' => 0, 'hal_almaaaml' => 0, 'kym_aldras' => 0, 'noaa_aldras' => 0, 'rkm_alaakar' => 0, 'mblgh_aledbar' => 0, 'mblgh_alekam_moejl_alsrf' => 0, 'almntk_altnthymy' => 0, 'shhr_aleghlak' => 0, 'aaam_aleghlak' => 0, 'aadd_altoabk' => 0, 'mjmoaa_alrkhs' => 0, 'almsah_alejmaly' => 0];
+                $checkMap = $dealsMap;
+                break;
+            case trans('crudbooster.file_type.paid_stays'):
+                $paidstaysMap = ['tarykh_alttbyk' => 0, 'tarykh_almthkr' => 0, 'rkm_almhnds' => 0, 'asm_almhnds' => 0, 'tarykh_almaaaml' => 0, 'rkm_almaaaml' => 0, 'almblgh' => 0, 'alshhr' => 0, 'alaaam' => 0, 'sahb_alaalak' => 0, 'almntk_alaakary' => 0, 'arkam_alaakarat' => 0, 'rkm_mhnds_almaaaml' => 0, 'asm_mhnds_almaaaml' => 0];
+                $checkMap = $paidstaysMap;
+                break;
+            case trans('crudbooster.file_type.monthly_ammounts'):
+                $monthlyMap = ['alshhr' => 0, 'alsn' => 0, 'asm_almhnds' => 0, 'rkm_almhnds' => 0, 'aaaml_alzmyl' => 0, 'alataaab' => 0, 'mkbod_tdkyk' => 0, 'alntham_almaly' => 0, 'alhs' => 0, 'alnsb' => 0, 'ashraf' => 0, 'rdyat_mkym' => 0, 'rdyat_edbar' => 0, 'mkbod_mshtrk' => 0, 'mlahthat' => 0, 'hsmyat' => 0, 'taaoydat' => 0, 'mord_llmshtrk' => 0, 'almkbod_alkly' => 0];
+                $checkMap = $monthlyMap;
+                break;
+            default: // personal
+                $personalMap = ['number' => 0, 'name' => 0, 'status' => 0, 'cota' => 0];
+                $checkMap = $personalMap;
+                break;
+        }
+        foreach ($checkMap as $key => $header) {
+            if (!in_array($key, $headerRow)) {
+                return 0;
+            }
+        }
+        return 1;
     }
 }
