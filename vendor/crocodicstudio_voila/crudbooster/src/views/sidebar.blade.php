@@ -44,7 +44,7 @@
 
                 @foreach (CRUDBooster::sidebarMenu() as $menu)
                     <li data-id='{{ $menu->id }}'
-                        class='{{ !empty($menu->children) ? 'treeview' : '' }} {{ Request::is($menu->url_path . '*') ? 'active' : '' }}'>
+                        class='{{ !empty($menu->children) ? 'treeview' : '' }} {{ Request::is($menu->url_path) ? 'active' : '' }}'>
                         <a href='{{ $menu->is_broken ? "javascript:alert('" . trans('crudbooster.controller_route_404') . "')" : $menu->url }}'
                             class='{{ $menu->color ? 'text-' . $menu->color : '' }}'>
                             <i class='{{ $menu->icon }} {{ $menu->color ? 'text-' . $menu->color : '' }}'></i>
@@ -99,7 +99,7 @@
                                 <span>{{ trans('crudbooster.Menu_Management') }}</span></a>
                         </li>
                     @endif
-                    @if (1 == 1)
+                    @if (1 == 0)
                         <li class='treeview'>
                             <a href='#'><i class='fa fa-key'></i>
                                 <span>{{ trans('crudbooster.Privileges_Roles') }}</span> <i

@@ -14,6 +14,11 @@ class Deal extends Model
     "confinement_area", "real_estate_area", "real_estate_num", "owner_name", "file_status", "organization_name",
     "operation_id","paid_year","paid_month"];
 
+
+    public function deal_details(){
+        return $this->hasMany(DealDetail::class, "deal_id");
+    }
+
     public function file_engineer(){
         return $this->belongsTo(User::class,"file_engineer_id");
     }

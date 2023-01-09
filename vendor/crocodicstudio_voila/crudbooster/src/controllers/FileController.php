@@ -10,7 +10,6 @@ class FileController extends Controller
 {
     public function getPreview($one, $two = null, $three = null, $four = null, $five = null)
     {
-
         if ($two) {
             $fullFilePath = 'uploads'.DIRECTORY_SEPARATOR.$one.DIRECTORY_SEPARATOR.$two;
             $filename = $two;
@@ -34,7 +33,7 @@ class FileController extends Controller
         $fullStoragePath = storage_path('app/'.$fullFilePath);
         $lifetime = 31556926; // One year in seconds
         try {
-        $handler = new \Symfony\Component\HttpFoundation\File\File(storage_path('app/'.$fullFilePath));
+            $handler = new \Symfony\Component\HttpFoundation\File\File(storage_path('app/'.$fullFilePath));
         } catch (\Exception $e) {
             abort(404);
         }

@@ -286,8 +286,8 @@ class uploadFiles extends Command
                 if (!$deal) {
                     $deal = Deal::create($dealData);
                     $dealsArr[] = (object) $deal->toArray();
-                } else {
                     DealDetail::where("deal_id", $deal->id)->delete();
+                } else {
                     Deal::where("id", $deal->id)->update($dealData);
                 }
                 $dealDetailsData["deal_id"] = $deal->id;
@@ -339,7 +339,6 @@ class uploadFiles extends Command
     public function writePaidStaysData($file)
     {
         $engineers = DB::table('cms_users')->where("id_cms_privileges", 2)->pluck("id", "num")->toArray();
-        $dealsArr = DB::table('v_residents_deals')->whereNull("deleted_at")->get()->toArray();
         $tempItems = TempPaidDeal::where('operation_id', $file->id)->orderBy('id')->get();
         foreach ($tempItems as $value) {
             try {
@@ -352,21 +351,11 @@ class uploadFiles extends Command
                     continue;
                 }
 
-                $deal = array_values(array_filter(
-                    $dealsArr,
-                    function ($item) use ($value) {
-                        if (is_string($item->file_date))
-                            return $item->file_num == intval($value["file_num"]) && $item->file_date == $value["file_date"];
-                        else
-                            return $item->file_num == intval($value["file_num"]) && $item->file_date->format("Y-m-d") == $value["file_date"]->format("Y-m-d");
-                    }
-                ))[0];
-
+                $deal = Deal::with("deal_details")->where("file_num",$value["file_num"])->where("file_date",$value["file_date"])->first();
                 if (!$deal && is_numeric($value["file_num"])) {
                     $deal = Deal::create([
                         "operation_id" => $file->id,
                         "file_num" => $value["file_num"],
-                        // "file_date" => $value["file_date"]->format("Y-m-d"),
                         "file_date" => $value["file_date"],
                         "owner_name" => $value["owner_name"],
                         "real_estate_area" => $value["real_estate_area"],
@@ -374,7 +363,6 @@ class uploadFiles extends Command
                         "real_estate_num" => $value["real_estate_num"],
                         "file_engineer_id" => $value["file_engineer_id"],
                     ]);
-                    $dealsArr[] = (object) $deal->toArray();
                 }
                 $engineer_id = $engineers[$value["engineer_id"]];
                 $deal_id = $deal->id;
@@ -391,9 +379,9 @@ class uploadFiles extends Command
                 ];
 
                 PaidDeal::create($paidDealData);
-                if (!$deal->paid_month && $deal->residents_count > 0) {
+                if (!$deal->paid_month && count($deal->deal_details) > 0) {
                     $paidDeals = PaidDeal::where("deal_id", $deal_id)->orderby("year", "desc")->orderby("month", "desc")->get();
-                    if ($paidDeals->count() == $deal->residents_count) {
+                    if ($paidDeals->count() == count($deal->deal_details)) {
                         Deal::where("id", $deal_id)->update([
                             "paid_month" => $paidDeals->last()->month,
                             "paid_year" => $paidDeals->last()->year,

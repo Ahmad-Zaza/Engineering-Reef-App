@@ -26,7 +26,7 @@ class AdminCmsUsersController extends \crocodicstudio_voila\crudbooster\controll
         $this->title_field = "name";
         $this->button_action_style = 'button_icon';
         // $this->button_import = CRUDBooster::me()->id_cms_privileges == 1;
-        $this->button_import = false;
+        $this->button_import = true;
         $this->button_export = false;
         $this->button_delete = false;
         $this->button_filter = false;
