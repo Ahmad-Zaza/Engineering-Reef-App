@@ -456,7 +456,7 @@ class uploadFiles extends Command
                 "factor" => $value["factor"],
                 "effort" => $value["effort"],
                 "financial_system" => $value["financial_system"],
-                "" => $value["percent"],
+                "percent" => $value["percent"],
                 "effort_percent" => $value["effort_percent"],
                 "share_out" => $value["share_out"],
                 "share_in" => $value["share_in"],
